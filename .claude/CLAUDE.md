@@ -459,14 +459,14 @@ All agents use prompt templates from `prompts/`:
 
 | Category | Path | Contents |
 |----------|------|----------|
+| Acceptance Tests | `prompts/acceptance-tests/` | `acceptance-tests-prompt.md`, `acceptance-tests-template.md` |
 | Code Review | `prompts/code-review-qa/` | `code-review-qa.md`, `code-review-template.md`, `code-review-brief-template.md`, `findings-detailed-template.md` |
 | Bug Report | `prompts/bug-report/` | `bug-report-prompt.md`, `bug-report-template.md`, `severity-criteria.md` |
-| Bugfix RCA | `prompts/bugfix-rca/` | `bugfix-rca-template.md` |
+| Bugfix RCA | `prompts/bugfix-rca/` | `bugfix-rca-prompt.md`, `bugfix-rca-template.md`, `bugfix-rca-e2e-template.md` |
 | Release Assessment | `prompts/release-assessment/` | `release-assessment-prompt.md`, `release-assessment-template.md`, `release-notes-prompt.md`, `slack-message-template.md` |
-| Requirements Analysis | `prompts/requirements-analysis/` | `requirements-analysis-template.md`, `requirements-analysis.md`, `workflow-orchestrator.md` |
+| Requirements Analysis | `prompts/requirements-analysis/` | `requirements-analysis-template.md`, `requirements-analysis.md` |
 | Dev Estimation | `prompts/dev-estimation/` | `dev-estimation-template.md` |
-| QA Test Plan | `prompts/qa-test-plan/` | `qa-test-plan-template.md` |
-| Feedback | `prompts/feedback/` | `feedback-template.md` |
+| Feedback | `prompts/feedback/` | `feedback-prompt.md`, `feedback-template.md` |
 
 **Always read the relevant template before generating any document.**
 
@@ -476,7 +476,7 @@ The Requirements Analysis agent uses a **7/10 scoring threshold**:
 
 | Score | Verdict | Next Steps |
 |-------|---------|------------|
-| **>= 7/10** | **READY** | **AUTO-GENERATE:** QA Test Plan + DEV Estimation |
+| **>= 7/10** | **READY** | **AUTO-GENERATE:** Acceptance Tests + DEV Estimation |
 | **< 7/10** | **NOT READY** | No QA/DEV work until PO resolves gaps |
 
 **AUTOMATIC WORKFLOW (Score >= 7/10):**
@@ -484,7 +484,7 @@ The Requirements Analysis agent uses a **7/10 scoring threshold**:
 Requirements Analysis (Score >= 7)
         |
         v AUTO-GENERATE
-QA Test Plan -> reports/requirements-analysis/<TICKET-ID>-qa-test-plan.md
+Acceptance Tests -> reports/requirements-analysis/<TICKET-ID>-acceptance-tests.md
         |
         v AUTO-GENERATE
 DEV Estimation -> reports/requirements-analysis/<TICKET-ID>-dev-estimation.md
@@ -502,13 +502,15 @@ DEV Estimation -> reports/requirements-analysis/<TICKET-ID>-dev-estimation.md
 | Code Review Brief | 450 words | `reports/code-review/<TICKET-ID>-code-review-brief.md` |
 | Code Review Deep Analysis | No limit | `reports/code-review/<TICKET-ID>-findings-detailed.md` |
 | Code Review Feedback | N/A (JSON) | `reports/feedback/<TICKET-ID>-feedback.json` |
-| Acceptance Tests | No limit | `reports/acceptance-tests/<TICKET-ID>-acceptance-tests.md` |
-| Bug Report | 900 words | `reports/bug-reports/<TICKET-ID>-bug-report.md` |
+| Acceptance Tests (standalone) | No limit | `reports/acceptance-tests/<TICKET-ID>-acceptance-tests.md` |
+| Acceptance Tests (from workflow) | No limit | `reports/requirements-analysis/<TICKET-ID>-acceptance-tests.md` |
+| Bug Report | 900 words | `reports/bug-report/<TICKET-ID>-bug-report.md` |
 | Bugfix RCA | 1500 words | `reports/bugfix-rca/<TICKET-ID>-rca.md` |
 | Requirements Analysis | 1500 words | `reports/requirements-analysis/<TICKET-ID>-requirements-analysis.md` |
-| Release Risk Assessment | 1500 words | `reports/week-release/Release-XX-YYYY-Risk-Assessment.md` |
-| Release Notes | No limit | `reports/week-release/Release-XX-YYYY-Release-Notes.md` |
-| Slack Message | 300 words | `reports/week-release/Release-XX-YYYY-Slack-Message.md` |
+| Dev Estimation (from workflow) | 1500 words | `reports/requirements-analysis/<TICKET-ID>-dev-estimation.md` |
+| Release Risk Assessment | 1500 words | `reports/release-analysis/Release-XX-YYYY-Risk-Assessment.md` |
+| Release Notes | No limit | `reports/release-analysis/Release-XX-YYYY-Release-Notes.md` |
+| Slack Message | 300 words | `reports/release-analysis/Release-XX-YYYY-Slack-Message.md` |
 
 ---
 

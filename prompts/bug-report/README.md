@@ -37,7 +37,7 @@ This agent helps QA and developers by automatically analyzing errors and excepti
 8. Test Data Requirements
 9. Regression Test Recommendation
 
-**Location:** `reports/bug-reports/<TICKET-ID>-bug-report.md`
+**Location:** `reports/bug-report/<TICKET-ID>-bug-report.md`
 
 ## Usage
 

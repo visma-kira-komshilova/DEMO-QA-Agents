@@ -1,12 +1,22 @@
+# Requirements Analysis Template
+
+Output format for requirements analysis reports (Phase 1). For analysis logic, see `requirements-analysis.md`. For orchestration, see `agents/vscode-chat-participants/requirements-analysis.md`.
+
+---
+
+## Document Structure
+
+```markdown
 # Requirements Analysis: <TICKET-ID>
 
 **Ticket:** <TICKET-ID>
 **Title:** {ticket title}
-**Date:** {date}
+**Date:** YYYY-MM-DD
 
 ---
 
-## 1. Requirements Summary
+<details>
+<summary><strong>1. Requirements Summary</strong></summary>
 
 | Aspect | Details |
 |--------|---------|
@@ -20,9 +30,11 @@
 - Reporter: {reporter}
 - Priority: {priority}
 - Labels: {labels}
-- Sprint: {sprint}
 
-## 2. Business Gap Analysis
+</details>
+
+<details>
+<summary><strong>2. Business Gap Analysis</strong></summary>
 
 | Gap Type | Description / Question | Impact if Unaddressed | Severity |
 |----------|----------------------|----------------------|----------|
@@ -36,16 +48,19 @@
 |-----|---------------------|--------|----------|
 | {what's missing} | {law/regulation} | {consequence} | Critical/Medium/Low |
 
-_(Use "N/A — no regulatory gaps identified" if not applicable)_
+_Use "N/A — no regulatory gaps identified" if not applicable._
 
 ### Critical Questions
 
 1. {specific question about a gap}
 2. {specific question about ambiguity}
 
-## 3. Requirements Readiness Score
+</details>
 
-**This is the canonical scoring definition.** All other documents (prompt, orchestrator) reference this table — update weights and dimensions here only.
+<details>
+<summary><strong>3. Requirements Readiness Score</strong></summary>
+
+**This is the canonical scoring definition.** All other documents reference this table — update weights and dimensions here only.
 
 | Criteria | Weight | Score | Weighted |
 |----------|--------|-------|----------|
@@ -74,12 +89,22 @@ _(Use "N/A — no regulatory gaps identified" if not applicable)_
 
 | Score | Verdict |
 |-------|---------|
-| **>= 7/10** | READY FOR DEVELOPMENT -- proceed to QA Test Plan + DEV Estimation |
-| **< 7/10** | NOT READY -- return to Product Owner with gap list |
+| **>= 7/10** | READY FOR DEVELOPMENT — proceed to QA Test Plan + DEV Estimation |
+| **< 7/10** | NOT READY — return to Product Owner with gap list |
 
 **Verdict: {READY / NOT READY} ({score}/10)**
 
-## 4. Edge Cases & Exception Scenarios
+### Blocking Issues (if score < 7/10)
+
+1. {Issue preventing development}
+2. {Issue preventing development}
+
+**Action Required:** {PO must clarify X, Y, Z before QA/DEV can proceed}
+
+</details>
+
+<details>
+<summary><strong>4. Edge Cases & Exception Scenarios</strong></summary>
 
 ### Null/Empty Data
 
@@ -105,7 +130,10 @@ _(Use "N/A — no regulatory gaps identified" if not applicable)_
 |----------|-------------------|
 | {failure scenario} | {expected handling} |
 
-## 5. Integration Impact
+</details>
+
+<details>
+<summary><strong>5. Integration Impact</strong></summary>
 
 | Repository | Affected? | Changes Needed |
 |------------|-----------|----------------|
@@ -116,35 +144,47 @@ _(Use "N/A — no regulatory gaps identified" if not applicable)_
 
 ### Cross-Repository Coordination
 
-{Any coordination needed between repos}
+{Deployment order, feature flags, coordinated changes}
 
-## 6. External Integrations
+</details>
+
+<details>
+<summary><strong>6. External Integrations</strong></summary>
 
 | System | Integration Type | Impact |
 |--------|------------------|--------|
 | {e.g., National e-Prescription Registry} | API call / webhook / batch | {changes needed} |
 
-_(Use "N/A -- No external integrations affected" if not applicable)_
+_Use "N/A — No external integrations affected" if not applicable._
 
-## 7. Error Handling
+</details>
+
+<details>
+<summary><strong>7. Error Handling</strong></summary>
 
 | Scenario | Error Message | Recovery |
 |----------|---------------|----------|
 | {error scenario} | {user-facing message} | {how to recover} |
 
-## 8. Data Requirements
+</details>
+
+<details>
+<summary><strong>8. Data Requirements</strong></summary>
 
 | Field | Type | Validation | Required? |
 |-------|------|------------|-----------|
 | {field} | {type} | {rules} | yes/no |
 
-## 8.5. Existing Code Impact
+### Existing Code Impact
 
 | File/Component | Purpose | Change Required | Complexity |
 |----------------|---------|-----------------|------------|
 | {path} | {what it does} | {what to change} | Low/Med/High |
 
-## 9. Missing Requirements Checklist
+</details>
+
+<details>
+<summary><strong>9. Missing Requirements Checklist</strong></summary>
 
 | Requirement Area | Status | Notes |
 |------------------|--------|-------|
@@ -162,29 +202,66 @@ _(Use "N/A -- No external integrations affected" if not applicable)_
 | Performance requirements defined | Yes/No | |
 | Audit/logging requirements defined | Yes/No | |
 
-## 10. Risk Assessment
+</details>
+
+<details>
+<summary><strong>10. Risk Assessment</strong></summary>
 
 | Risk | Likelihood | Impact | Mitigation |
 |------|------------|--------|------------|
 | {risk} | Low/Med/High | Low/Med/High | {mitigation strategy} |
 
-## 11. Recommendations
+</details>
+
+<details>
+<summary><strong>11. Recommendations</strong></summary>
 
 1. {recommendation 1}
 2. {recommendation 2}
-3. {recommendation 3}
 
-## 12. Questions for Product Owner
+</details>
+
+<details>
+<summary><strong>12. Questions for Product Owner</strong></summary>
 
 1. {specific, actionable question}
 2. {specific, actionable question}
 
-## 13. Questions for Developers
+</details>
+
+<details>
+<summary><strong>13. Questions for Developers</strong></summary>
 
 1. {question about existing implementation}
 2. {question about technical constraints}
-3. {question about integration points}
+
+</details>
 
 ---
 
-**Constraints:** Max 1500 words · Tables over prose · Specific questions only
+_Generated by @hb-requirements-analysis | {date}_
+```
+
+---
+
+## Section Constraints
+
+| Section | Constraint |
+|---------|-----------|
+| 1. Requirements Summary | Table format. JIRA context if available. |
+| 2. Gap Analysis | Must include Business + Domain/Regulatory sub-sections. |
+| 3. Readiness Score | **Canonical source** for 7-dimension weighted model. All 7 criteria mandatory. |
+| 4. Edge Cases | Sub-tables by category (Null, Boundary, Timing, External). |
+| 5. Integration Impact | All core repos assessed. Cross-repo coordination if multi-repo. |
+| 6. External Integrations | "N/A" if not applicable. |
+| 7. Error Handling | Scenario + message + recovery per row. |
+| 8. Data Requirements | Includes Existing Code Impact sub-section. |
+| 9. Missing Requirements | 13-item checklist — all rows present. |
+| 10-11. Risk + Recommendations | Specific and actionable. |
+| 12-13. Questions | Specific questions only — not generic "please clarify." |
+
+---
+
+## Output Location
+
+`reports/requirements-analysis/<TICKET-ID>-requirements-analysis.md`

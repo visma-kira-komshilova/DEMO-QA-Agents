@@ -1,51 +1,65 @@
+# Bugfix RCA Template
+
+Output format for RCA report. For analysis logic, see `bugfix-rca-prompt.md`. For E2E report format, see `bugfix-rca-e2e-template.md`.
+
+---
+
+## Document Structure
+
+```markdown
 # Root Cause Analysis: <TICKET-ID>
 
 **Branch:** `<branch-name>`
-**Repository:** `<repo-name>` _(selected because: [branch found in this repo / only repo with matching branch / etc.])_
+**Repository:** `<repo-name>` _(selected because: [reason])_
 **Mode:** Hotfix / Investigation
 **Release:** `<release-branch>` _(Hotfix mode only)_
 **Date:** {date}
 
 ---
 
-## 1. Executive Summary
+<details>
+<summary><strong>1. Executive Summary</strong></summary>
 
 | Field | Details |
 |-------|---------|
 | **Repository** | {repo name — how it was selected} |
 | **Bug Description** | {what went wrong} |
-| **Causative PR/Commit** | {PR # or commit hash, or "Unknown — see Failure Handling"} |
+| **Causative PR/Commit** | {PR # or commit hash, or "Unknown — not identifiable from git history"} |
 | **Root Cause Category** | {Edge Case / NULL Handling / Logic Error / etc.} |
 | **Preventability Verdict** | Preventable / Partially Preventable / Not Preventable |
 | **Severity** | Critical / High / Medium / Low |
 | **Environment** | Production / Staging / Testing |
 
-## 2. Bugfix Pattern Match
+</details>
+
+<details>
+<summary><strong>2. Bugfix Pattern Match</strong></summary>
 
 > **MANDATORY SECTION — Do not skip.**
->
-> Use the pattern table matching the **analyzed repository** (not just branch prefix).
-> See `context/historical-bugfix-patterns.md` for all repository-specific pattern tables.
+> Use the pattern table matching the **analyzed repository**.
+> See `context/historical-bugfix-patterns.md` for all pattern tables.
 
 | Pattern | % of Historical Bugs | Match? | Evidence |
 |---------|---------------------|--------|----------|
-| [Pattern 1 from repo table] | XX% | EXACT/PARTIAL/No Match | {evidence} |
-| [Pattern 2 from repo table] | XX% | EXACT/PARTIAL/No Match | {evidence} |
-| [Pattern 3 from repo table] | XX% | EXACT/PARTIAL/No Match | {evidence} |
-| [Pattern 4 from repo table] | XX% | EXACT/PARTIAL/No Match | {evidence} |
-| [Pattern 5 from repo table] | XX% | EXACT/PARTIAL/No Match | {evidence} |
-| [Pattern 6 from repo table] | XX% | EXACT/PARTIAL/No Match | {evidence} |
-| _[Pattern 7+ if repo table has more]_ | XX% | EXACT/PARTIAL/No Match | {evidence} |
+| {Pattern 1} | XX% | EXACT/PARTIAL/No Match | {evidence} |
+| {Pattern 2} | XX% | EXACT/PARTIAL/No Match | {evidence} |
+| {Pattern 3} | XX% | EXACT/PARTIAL/No Match | {evidence} |
+| {Pattern 4} | XX% | EXACT/PARTIAL/No Match | {evidence} |
+| {Pattern 5} | XX% | EXACT/PARTIAL/No Match | {evidence} |
+| {Pattern 6+} | XX% | EXACT/PARTIAL/No Match | {evidence} |
 
 **Primary Pattern Match:** {pattern name} ({percentage}%)
 **Secondary Pattern:** {pattern name, if any}
-**Combined Score:** {primary %}% of historical hotfixes match this primary pattern. {Secondary pattern noted as secondary factor, if applicable.}
+**Combined Score:** {primary %}% of historical hotfixes match this primary pattern. {Secondary noted as secondary factor, if applicable.}
 
-> **Combined Score = Primary pattern % only.** Do not sum primary + secondary percentages.
+> Combined Score = Primary pattern % only. Do not sum primary + secondary.
 
-**Why This Matters:** {Brief explanation of how this pattern typically occurs and how to prevent it}
+**Why This Matters:** {How this pattern typically occurs and how to prevent it}
 
-## 3. Timeline
+</details>
+
+<details>
+<summary><strong>3. Timeline</strong></summary>
 
 | Event | Date | Details |
 |-------|------|---------|
@@ -55,27 +69,33 @@
 
 _(If approaching 1500-word limit, abbreviate to a single sentence.)_
 
-## 4. Technical Root Cause
+</details>
+
+<details>
+<summary><strong>4. Technical Root Cause</strong></summary>
 
 ### Original Code (Buggy)
 
-```
-{code snippet showing the bug, 5-10 lines}
-```
+\`\`\`
+{code snippet, 5-10 lines}
+\`\`\`
 
 **File:** `{file}:{line}`
 
 ### Fixed Code
 
-```
-{code snippet showing the fix, 5-10 lines}
-```
+\`\`\`
+{code snippet, 5-10 lines}
+\`\`\`
 
 ### Analysis
 
-{Explain why the original code was incorrect. Reference file:line locations.}
+{Why the original code was incorrect. Reference file:line locations.}
 
-## 5. 5 Whys Analysis
+</details>
+
+<details>
+<summary><strong>5. 5 Whys Analysis</strong></summary>
 
 | # | Why? | Answer |
 |---|------|--------|
@@ -85,9 +105,12 @@ _(If approaching 1500-word limit, abbreviate to a single sentence.)_
 | 4 | Why did {underlying cause} happen? | {systemic cause} |
 | 5 | Why did {systemic cause} happen? | **{root cause}** |
 
-**Root Cause:** {1-2 sentence summary of the true root cause}
+**Root Cause:** {1-2 sentence summary}
 
-## 6. Preventability Assessment
+</details>
+
+<details>
+<summary><strong>6. Preventability Assessment</strong></summary>
 
 | Prevention Layer | Could it have caught this? | Gap |
 |-----------------|---------------------------|-----|
@@ -100,7 +123,10 @@ _(If approaching 1500-word limit, abbreviate to a single sentence.)_
 
 **Most effective prevention:** {which layer would have been most effective}
 
-## 7. Recommendations
+</details>
+
+<details>
+<summary><strong>7. Recommendations</strong></summary>
 
 1. **Immediate:** {action to prevent recurrence}
 2. **Short-term:** {process or test improvement}
@@ -108,16 +134,22 @@ _(If approaching 1500-word limit, abbreviate to a single sentence.)_
 
 _(If approaching 1500-word limit, abbreviate to 2 items.)_
 
+</details>
+```
+
 ---
 
-**Constraints reminder:**
+## Constraints
 
 - Max 1500 words
-- Bugfix Pattern Match section (Section 2) is MANDATORY — never skip it
-- Use the correct pattern table based on **repository** (not just branch prefix)
-- Combined Score = primary pattern % only — do NOT sum percentages
-- Repository selection must be stated in the header
+- Bugfix Pattern Match (Section 2) is MANDATORY
+- Combined Score = primary % only — do NOT sum
+- Repository selection stated in header
 - file:line references for all code analysis
-- 5 Whys must reach a systemic root cause, not stop at the surface
-- If causative commit is unknown, state "Unknown" — do not fabricate
-- Sections 3 and 7 may be abbreviated if space is tight; Sections 1, 2, 4, 5, 6 must not be abbreviated
+- 5 Whys must reach systemic root cause
+- If causative commit unknown, state "Unknown" — do not fabricate
+- Sections 3 and 7 may be abbreviated if tight; Sections 1, 2, 4, 5, 6 must not
+
+## Output Location
+
+`reports/bugfix-rca/<TICKET-ID>-rca.md`

@@ -8,6 +8,47 @@ A centralized repository for AI prompts and agents used across HealthBridge proj
 
 ---
 
+## How It Works
+
+These agents rely on three foundational assumptions about the development workflow:
+
+### 1. JIRA for Project Management and Bug Tracking
+
+All development tasks, bug fixes, and feature requests are tracked as JIRA tickets with unique IDs. Each ticket prefix maps to a set of repositories:
+
+| Ticket Prefix | Example | Scope |
+|---------------|---------|-------|
+| `HM-*` | `HM-14200` | HealthBridge-Web, HealthBridge-Api, Claims-Processing, Prescriptions-Api |
+| `HBP-*` | `HBP-5001` | HealthBridge-Portal |
+| `HMM-*` | `HMM-3200` | HealthBridge-Mobile |
+
+### 2. Branch Naming Convention
+
+**Git branch names must contain the JIRA ticket ID.** This is the mechanism that allows agents to automatically locate the correct branch in any repository when given only a ticket ID.
+
+Valid branch names: `HM-14200`, `HM-14200-prescription-renewal`, `feature/HM-14200`
+
+When a user provides a ticket ID (e.g., `HM-14200`), agents:
+1. Search all repositories for branches matching `*HM-14200*`
+2. Fetch latest from remote (`git fetch origin` — safe, non-destructive)
+3. Analyze using remote tracking branches (`origin/HM-14200-...`) without disrupting the developer's working directory
+
+This means **the user only needs to provide a ticket ID** — the agents handle repository discovery, branch detection, and analysis automatically.
+
+### 3. Release Branch Convention
+
+Releases are managed through **release branches** (e.g., `release/Release-04/2026`). Each release branch aggregates merged feature branches scheduled for that deployment.
+
+The **Release Analysis agent** uses this convention to:
+1. Identify the release branch by name (e.g., `Release-09/2026`)
+2. Compare it against the base branch (`main`) to find all included changes
+3. Analyze each merged PR for risk, test coverage, and deployment concerns
+4. Generate a Risk Assessment, Release Notes, and Slack Message
+
+This means **the user only needs to provide a release identifier** (e.g., `Release-09/2026`) — the agent finds the branch, fetches the latest, and performs a complete release analysis automatically.
+
+---
+
 ## Multi-Repository Workspace
 
 This repository is designed to work within a **multi-repository VS Code/Cursor workspace** that contains all HealthBridge repositories. The AI agents require access to multiple repositories to perform comprehensive analysis across the codebase.
@@ -181,24 +222,6 @@ User Input (ticket ID, error, release name)
 - **Predictive bug detection** -- Historical hotfix patterns (Edge Cases 28%, Authorization 22%, NULL 18%) are used to flag risks before merge
 - **Cross-platform** -- All commands and tools work on macOS, Windows, and Linux
 - **Template-driven output** -- Every report follows a standardized template for consistency and auditability
-
-### JIRA Ticket ID and Git Branch Naming Convention
-
-**JIRA is used for task management and defect tracking.** Every development task, bug fix, and feature request is tracked as a JIRA ticket with a unique ID.
-
-**The JIRA ticket ID MUST be used when creating Git branches.** This is the key mechanism that allows QA agents to automatically find the corresponding branch in any repository.
-
-| JIRA Ticket ID | Git Branch Name | Repository |
-|----------------|----------------|------------|
-| `HM-14200` | `HM-14200-prescription-renewal` | HealthBridge-Web, HealthBridge-Api, Claims-Processing, Prescriptions-Api |
-| `HBP-5001` | `HBP-5001-portal-dashboard-fix` | HealthBridge-Portal |
-| `HMM-3200` | `HMM-3200-mobile-appointment-view` | HealthBridge-Mobile |
-
-**Rules:**
-- Branch name **must start with or contain** the JIRA ticket ID (e.g., `HM-14200`, `HM-14200-feature-name`, `feature/HM-14200`)
-- Agents search for branches using `git branch -r --list "*<TICKET_ID>*"` -- the ticket ID substring is sufficient
-- One JIRA ticket = one branch per repository (a ticket may span multiple repos)
-- Commit messages should also include the ticket ID for commit filtering
 
 ---
 
@@ -786,7 +809,7 @@ at HealthBridge.Controllers.PrescriptionController.Create()
 - Severity assessment (Critical / High / Medium / Low)
 - Ticket-ready fields (Summary, Description, Steps, Story Points)
 - Test recommendations
-- Output: `DEMO-QA-Agents/reports/bug-reports/<descriptive-name>-bug-report.md`
+- Output: `DEMO-QA-Agents/reports/bug-report/<descriptive-name>-bug-report.md`
 
 ---
 
@@ -851,7 +874,7 @@ Requirements:
 - Output: `DEMO-QA-Agents/reports/requirements-analysis/HM-15000-requirements-analysis.md`
 
 **If score >= 7/10:** Agent automatically generates:
-- QA Test Plan: `HM-15000-qa-test-plan.md`
+- Acceptance Tests: `HM-15000-acceptance-tests.md`
 - Dev Estimation: `HM-15000-dev-estimation.md`
 
 **If score < 7/10:** Stops with critical questions -- no QA/Dev work until clarified.
@@ -873,7 +896,7 @@ Requirements:
 - **E2E Test Maintenance Plan** -- CREATE/UPDATE/DELETE recommendations
 - Manual testing checklist (prioritized)
 - Go/No-Go recommendation
-- Outputs (all in `DEMO-QA-Agents/reports/week-release/`):
+- Outputs (all in `DEMO-QA-Agents/reports/release-analysis/`):
   - `Release-04-2026-Risk-Assessment.md` (Full analysis)
   - `Release-04-2026-Release-Notes.md` (Customer-facing)
   - `Release-04-2026-Slack-Message.md` (Team notification)
@@ -885,7 +908,7 @@ Requirements:
 #### Workflow 1: New Feature Development
 ```
 1. @hb-requirements-analysis [ticket]          -> Validate requirements
-2. (If score >=7) -> QA Test Plan + Dev Estimation auto-generated
+2. (If score >=7) -> Acceptance Tests + Dev Estimation auto-generated
 3. [Developer implements]
 4. @hb-code-review [branch]                 -> Pre-merge review
 5. @hb-acceptance-tests [branch]            -> Final test scenarios
@@ -957,17 +980,36 @@ DEMO-QA-Agents/
 │       └── release-analysis.md                 # Release risk assessment agent
 │
 ├── prompts/                                    # Prompt Templates
+│   ├── acceptance-tests/                       # Acceptance tests prompt + template
+│   │   ├── acceptance-tests-prompt.md
+│   │   └── acceptance-tests-template.md
+│   ├── bug-report/                             # Bug report prompt + template + severity criteria
+│   │   ├── bug-report-prompt.md
+│   │   ├── bug-report-template.md
+│   │   ├── severity-criteria.md
+│   │   └── README.md
+│   ├── bugfix-rca/                             # Root cause analysis prompt + templates
+│   │   ├── bugfix-rca-prompt.md
+│   │   ├── bugfix-rca-template.md
+│   │   └── bugfix-rca-e2e-template.md
 │   ├── code-review-qa/                         # Code review prompt + templates + findings-detailed
 │   │   ├── code-review-qa.md
 │   │   ├── code-review-template.md
 │   │   ├── code-review-brief-template.md
 │   │   ├── findings-detailed-template.md
 │   │   └── README.md
-│   ├── bug-report/                             # Bug report template
-│   │   └── bug-report-template.md
-│   ├── bugfix-rca/                             # Root cause analysis template
-│   │   └── bugfix-rca-template.md
-│   └── requirements-analysis/                  # Requirements analysis template (7/10 scoring)
+│   ├── dev-estimation/                         # Dev estimation template
+│   │   └── dev-estimation-template.md
+│   ├── feedback/                               # Developer feedback prompt + template
+│   │   ├── feedback-prompt.md
+│   │   └── feedback-template.md
+│   ├── release-assessment/                     # Release assessment prompt + templates
+│   │   ├── release-assessment-prompt.md
+│   │   ├── release-assessment-template.md
+│   │   ├── release-notes-prompt.md
+│   │   └── slack-message-template.md
+│   └── requirements-analysis/                  # Requirements analysis prompt + template (7/10 scoring)
+│       ├── requirements-analysis.md
 │       └── requirements-analysis-template.md
 │
 ├── context/                                    # Shared Context Files
@@ -975,6 +1017,7 @@ DEMO-QA-Agents/
 │   ├── jira-field-mappings.md                  # Auto-detect ticket components from file paths
 │   ├── code-review-false-positive-prevention.md  # Known safe patterns to avoid flagging
 │   ├── healthbridge-repository-dependencies.md # Consumer/Provider dependency map across all repos
+│   ├── historical-bugfix-patterns.md           # RCA-derived bugfix patterns by repo type
 │   ├── domain-prescriptions.md                 # Domain: Prescriptions & Medications
 │   ├── domain-patient-records.md               # Domain: Patient Records & Charts
 │   └── README.md
@@ -1005,15 +1048,13 @@ DEMO-QA-Agents/
 │   └── README.md
 │
 └── reports/                                    # Generated Outputs
-    ├── code-review/                            # PR code review reports (brief & comprehensive)
-    ├── acceptance-tests/                       # Acceptance test scenarios
-    ├── bug-reports/                            # Bug reports and RCA documents
-    ├── bugfix-rca/                             # Root cause analysis reports
-    ├── requirements-analysis/                  # Requirements + QA plan + dev estimation
-    ├── week-release/                           # Release risk assessments and notes
+    ├── acceptance-tests/                       # Standalone acceptance test scenarios
+    ├── bug-report/                             # Bug reports with fix recommendations
+    ├── bugfix-rca/                             # Root cause analysis + E2E test recommendations
+    ├── code-review/                            # PR code review reports (brief & comprehensive) + findings-detailed
     ├── feedback/                               # Developer feedback JSON files
-    ├── qa-test-plan/                           # QA test plan outputs
-    └── dev-estimation/                         # Development estimation outputs
+    ├── release-analysis/                       # Release risk assessments, release notes, Slack messages
+    └── requirements-analysis/                  # Requirements analysis + acceptance tests + dev estimation
 ```
 
 ---
@@ -1048,10 +1089,10 @@ Reports are saved to `DEMO-QA-Agents/reports/` (from workspace root):
 |-----------|---------|------------|
 | **`reports/code-review/`** | PR code review reports (brief and comprehensive) + findings-detailed analysis | 1300 / 450 words |
 | **`reports/acceptance-tests/`** | Acceptance test scenarios with BDD format | No limit |
-| **`reports/bug-reports/`** | Ticket-ready bug reports with fix recommendations | 900 words |
+| **`reports/bug-report/`** | Ticket-ready bug reports with fix recommendations | 900 words |
 | **`reports/bugfix-rca/`** | Root cause analysis and E2E test recommendations | 1500 words |
-| **`reports/requirements-analysis/`** | Requirements analysis + QA test plan + dev estimation | 1500 words |
-| **`reports/week-release/`** | Release risk assessment + release notes + Slack message | 1500 words |
+| **`reports/requirements-analysis/`** | Requirements analysis + acceptance tests + dev estimation | 1500 words |
+| **`reports/release-analysis/`** | Release risk assessment + release notes + Slack message | 1500 words |
 | **`reports/feedback/`** | Developer feedback JSON files for accuracy tracking | N/A (JSON) |
 
 ---
@@ -1060,9 +1101,13 @@ Reports are saved to `DEMO-QA-Agents/reports/` (from workspace root):
 
 | Prompt | Location | Description |
 |--------|----------|-------------|
-| Code Review QA | `prompts/code-review-qa/` | PR analysis with hotfix pattern detection, findings-detailed template, brief format |
+| Acceptance Tests | `prompts/acceptance-tests/` | Given/When/Then scenario generation with BDD format |
 | Bug Report | `prompts/bug-report/` | Error analysis + ticket-ready bug reports with severity criteria |
-| Bugfix RCA | `prompts/bugfix-rca/` | Root cause analysis framework |
+| Bugfix RCA | `prompts/bugfix-rca/` | Root cause analysis + E2E test recommendations |
+| Code Review QA | `prompts/code-review-qa/` | PR analysis with hotfix pattern detection, findings-detailed, brief format |
+| Dev Estimation | `prompts/dev-estimation/` | Task breakdown with file paths and risk buffers |
+| Feedback | `prompts/feedback/` | Developer feedback collection and accuracy tracking |
+| Release Assessment | `prompts/release-assessment/` | Release risk assessment, release notes, Slack message |
 | Requirements Analysis | `prompts/requirements-analysis/` | Requirements validation with 7/10 scoring gate |
 
 ---

@@ -535,12 +535,12 @@ DEV Estimation  ->  <TICKET-ID>-dev-estimation.md
 | Acceptance Tests | No limit | `reports/acceptance-tests/<TICKET-ID>-acceptance-tests.md` |
 | Requirements Analysis | 1500 words | `reports/requirements-analysis/<TICKET-ID>-requirements-analysis.md` |
 | QA Test Plan (from workflow) | 1000 words | `reports/requirements-analysis/<TICKET-ID>-qa-test-plan.md` |
-| Dev Estimation (from workflow) | 800 words | `reports/requirements-analysis/<TICKET-ID>-dev-estimation.md` |
-| Bug Report | 900 words | `reports/bug-reports/<TICKET-ID>-bug-report.md` |
+| Dev Estimation (from workflow) | 1500 words | `reports/requirements-analysis/<TICKET-ID>-dev-estimation.md` |
+| Bug Report | 900 words | `reports/bug-report/<TICKET-ID>-bug-report.md` |
 | Bugfix RCA | 1500 words | `reports/bugfix-rca/<TICKET-ID>-rca.md` |
-| Release Risk Assessment | 1500 words | `reports/week-release/Release-XX-YYYY-Risk-Assessment.md` |
-| Release Notes | No limit | `reports/week-release/Release-XX-YYYY-Release-Notes.md` |
-| Slack Message | 300 words | `reports/week-release/Release-XX-YYYY-Slack-Message.md` |
+| Release Risk Assessment | 1500 words | `reports/release-analysis/Release-XX-YYYY-Risk-Assessment.md` |
+| Release Notes | No limit | `reports/release-analysis/Release-XX-YYYY-Release-Notes.md` |
+| Slack Message | 300 words | `reports/release-analysis/Release-XX-YYYY-Slack-Message.md` |
 
 ---
 
