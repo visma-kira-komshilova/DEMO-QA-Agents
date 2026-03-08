@@ -1,3 +1,12 @@
+# Bug Report Template
+
+Output format for bug report documents. For analysis logic, see `bug-report-prompt.md`. For severity details, see `severity-criteria.md`.
+
+---
+
+## Document Structure
+
+```markdown
 # Bug Report: {Error Summary Title}
 
 **Ticket:** <TICKET-ID>
@@ -9,146 +18,164 @@
 | Field | Value |
 |-------|-------|
 | **Summary** | {concise bug title, max 80 chars} |
-| **Component** | {affected HealthBridge component, e.g., Patient Portal, Scheduling, Billing, Lab Results, Prescriptions} |
-| **Severity** | {one of: 🔴 Critical / 🟠 High / 🟡 Medium / 🟢 Low} |
-| **Labels** | {relevant labels, e.g., regression, data-integrity, ui-defect, api-error} |
-| **Affects Version** | {derive from: release branch name pattern `Release-<WEEK>/<YEAR>`, or `version.txt`, or `package.json` -- format as `Release-<WEEK>/<YEAR>` e.g., `Release-07/2026`} |
+| **Component** | {auto-detected from file paths per prompt rules} |
+| **Severity** | {🔴 Critical / 🟠 High / 🟡 Medium / 🟢 Low} |
+| **Labels** | {pattern + area + severity labels} |
+| **Affects Version** | {from release branch `Release-<WEEK>/<YEAR>`, or `version.txt`, or `package.json`} |
 
 ---
 
-## 1. Error Summary
+<details>
+<summary><strong>1. Error Summary</strong></summary>
 
 > _30-50 words describing the bug concisely. State what is broken, where, and the immediate consequence._
 
 {summary}
 
-## 2. Steps to Reproduce
+</details>
+
+<details>
+<summary><strong>2. Steps to Reproduce</strong></summary>
 
 **Preconditions:**
-- {precondition 1, e.g., user role, account state, feature flags}
-- {precondition 2, e.g., specific data setup, browser/device}
+- {precondition 1}
+- {precondition 2}
 
 **Steps:**
-1. {step 1 — navigate to specific page or trigger specific action}
-2. {step 2 — enter data or interact with UI element}
-3. {step 3 — submit, save, or trigger the operation}
-4. Observe: {what goes wrong — error message, incorrect result, crash}
+1. {step 1}
+2. {step 2}
+3. {step 3}
+4. Observe: {what goes wrong}
 
 **Frequency:** {Always / Intermittent (~X%) / Only under specific conditions}
-— _Derive from: reproduction attempts during analysis, git blame recency (new code = likely always), confidence level (low confidence = likely intermittent)_
 
-## 3. Expected vs. Actual Behavior
+</details>
 
-> _Expected: derive from acceptance criteria, requirements doc, or equivalent working behavior in a prior release. Actual: copy exact error message, incorrect value, or UI state observed — no paraphrasing._
+<details>
+<summary><strong>3. Expected vs. Actual Behavior</strong></summary>
 
 | | Description |
 |---|------------|
-| **Expected** | {what should happen — cite requirement or prior behavior if available} |
-| **Actual** | {exact error message, incorrect value, or UI state — quote verbatim where possible} |
+| **Expected** | {cite requirement or prior behavior} |
+| **Actual** | {exact error message or UI state — quote verbatim} |
 
-## 4. Root Cause Analysis
+</details>
 
-> _100-150 words explaining why the bug occurs. Reference specific code locations._
+<details>
+<summary><strong>4. Root Cause Analysis</strong></summary>
 
-**Confidence:** {🟢 High (90-100%) / 🟡 Medium (60-89%) / 🔴 Low (30-59%)} — {one sentence justification, e.g., "Clear stack trace to exact line, easily reproducible."}
+> _100-150 words explaining why the bug occurs._
 
-{Analysis of the underlying cause. Explain the code path that leads to the defect,
-why the logic fails, and under what conditions the bug manifests.}
+**Confidence:** {🟢 High (90-100%) / 🟡 Medium (60-89%) / 🔴 Low (30-59%)} — {one sentence justification}
 
-```csharp
+**Hotfix Pattern:** {pattern category from historical-bugfix-patterns.md}
+
+{Analysis of the underlying cause — code path, why the logic fails, under what conditions.}
+
+\`\`\`csharp
 // File: {file-path}:{line-number}
-// Code causing the issue (5-10 lines max):
-{relevant code snippet showing the defect}
-```
+{relevant code snippet, 5-10 lines max}
+\`\`\`
 
-## 5. Impact Assessment
+</details>
+
+<details>
+<summary><strong>5. Impact Assessment</strong></summary>
 
 | Factor | Assessment |
 |--------|-----------|
-| **Severity Justification** | {explain why this severity level was chosen based on the criteria below} |
-| **User Impact** | {who is affected — patients, clinicians, admins; how many; which workflows break} |
-| **Data Risk** | {any risk of data corruption, data loss, or incorrect medical records} |
-| **Workaround Available?** | {Yes / No} — {if yes, describe the workaround steps} |
+| **Severity Justification** | {why this severity, based on severity-criteria.md} |
+| **User Impact** | {who, how many, which workflows break} |
+| **Data Risk** | {corruption, loss, incorrect records risk} |
+| **Workaround Available?** | {Yes/No — describe if yes} |
 
-### Severity Criteria Reference
+</details>
 
-| Severity | Priority | Criteria |
-|----------|----------|----------|
-| 🔴 Critical | P1 | Data loss/corruption, security breach, system unusable, patient safety risk, HIPAA violation |
-| 🟠 High | P2 | Core feature broken, no workaround, affects many users or critical workflows |
-| 🟡 Medium | P3 | Feature impaired but workaround exists, limited user impact |
-| 🟢 Low | P4 | Cosmetic issue, no functional impact |
-
-## 6. Pattern Scope Analysis
+<details>
+<summary><strong>6. Pattern Scope Analysis</strong></summary>
 
 | Question | Answer |
 |----------|--------|
-| **Isolated or pattern?** | {Isolated incident / Part of a broader pattern} |
-| **Similar code elsewhere?** | {file paths where the same anti-pattern or similar logic exists} |
-| **Related PRs/Commits** | {commit hashes or PR numbers from git log that introduced or fixed similar patterns, or "None found"} |
-| **Related JIRA tickets** | {manually link if known, or "Requires JIRA search — see related commit IDs above"} |
+| **Isolated or pattern?** | {Isolated / Part of broader pattern} |
+| **Similar code elsewhere?** | {file paths where same anti-pattern exists} |
+| **Related PRs/Commits** | {commit hashes or PR numbers, or "None found"} |
+| **Related JIRA tickets** | {link if known, or "Requires JIRA search"} |
 
-> _If this is part of a pattern, list all affected locations so a comprehensive fix can be applied._
+> _If pattern: list all affected locations for comprehensive fix._
 
-## 7. Fix Recommendation
+</details>
+
+<details>
+<summary><strong>7. Fix Recommendation</strong></summary>
 
 | Option | Scope | Effort | Risk |
 |--------|-------|--------|------|
-| **Quick Fix** | {minimal change, address immediate symptom} | {Low, e.g., 1-2h} | {Medium — may not address root cause} |
-| **Proper Fix** | {address root cause in affected component} | {Medium, e.g., 4-8h} | {Low — targeted fix} |
-| **Comprehensive Fix** | {fix root cause + all similar patterns in codebase} | {High, e.g., 8-16h} | {Very Low — prevents recurrence} |
+| **Quick Fix** | {minimal change, address symptom} | {Low, 1-2h} | {Medium} |
+| **Proper Fix** | {root cause in component} | {Medium, 4-8h} | {Low} |
+| **Comprehensive Fix** | {root cause + all similar patterns} | {High, 8-16h} | {Very Low} |
 
-**Recommended: {Quick Fix / Proper Fix / Comprehensive Fix}** — {one sentence justification}
+**Recommended: {option}** — {one sentence justification}
 
-```csharp
+\`\`\`csharp
 // Recommended fix in {file-path}:{line-number} (3-5 lines max):
-{code snippet showing the recommended option's implementation}
-```
+{code snippet}
+\`\`\`
 
-**Validation:** {How to verify the fix works — specific checks or assertions}
+**Validation:** {how to verify the fix works}
 
-## 8. Test Data Requirements
+</details>
 
-> _Identify the exact data state that triggers the bug. Derive from Steps to Reproduce preconditions and root cause analysis. Include user roles, record states, and any specific field values required._
+<details>
+<summary><strong>8. Test Data Requirements</strong></summary>
 
 | Data Needed | Details |
 |-------------|---------|
-| {data type, e.g., patient record} | {specific values or conditions, e.g., "Patient with no assigned GP, IsActive=true"} |
-| {data type, e.g., user role} | {specific role and permissions required, e.g., "Nurse role, no admin rights"} |
-| {data type, e.g., feature flag} | {flag name and required state, e.g., "PrescriptionV2=enabled"} |
+| {data type} | {specific values or conditions} |
+| {data type} | {role and permissions required} |
 
 **SQL/Setup (if applicable):**
-```sql
--- Query to create or identify test data:
-{SQL query or manual setup steps to prepare the environment for reproduction}
-```
+\`\`\`sql
+{query or setup steps}
+\`\`\`
 
-## 9. Regression Test Recommendation
+</details>
+
+<details>
+<summary><strong>9. Regression Test Recommendation</strong></summary>
 
 ### Manual Tests
 
 | # | Scenario | Steps | Expected Result |
 |---|----------|-------|-----------------|
-| 1 | {primary bug scenario} | {numbered steps} | {expected correct behavior} |
-| 2 | {edge case or related scenario} | {numbered steps} | {expected correct behavior} |
-| 3 | {boundary or negative test} | {numbered steps} | {expected correct behavior} |
+| 1 | {primary bug scenario} | {steps} | {expected} |
+| 2 | {edge case from pattern} | {steps} | {expected} |
+| 3 | {negative/validation test} | {steps} | {expected} |
 
 ### E2E Automation Gaps
 
 | Framework | Repository | Coverage | Recommendation |
 |-----------|------------|----------|----------------|
-| Selenium UI (Python) | HealthBridge-Selenium-Tests | {Full / Partial / Gap / N/A} | {existing test name, or new test to add, or "Outside scope"} |
-| Selenium Integration (Python) | HealthBridge-Selenium-Tests | {Full / Partial / Gap / N/A} | {existing test name, or new test to add, or "Outside scope"} |
-| Playwright (TypeScript) | HealthBridge-E2E-Tests | {Full / Partial / Gap / N/A} | {existing test name, or new test to add, or "Outside scope"} |
-| Mobile (WebdriverIO) | HealthBridge-Mobile-Tests | {Full / Partial / Gap / N/A} | {existing test name, or new test to add, or "Outside scope"} |
+| Selenium UI (Python) | HealthBridge-Selenium-Tests | {Full/Partial/Gap/N/A} | {test name or recommendation} |
+| Selenium Integration (Python) | HealthBridge-Selenium-Tests | {Full/Partial/Gap/N/A} | {test name or recommendation} |
+| Playwright (TypeScript) | HealthBridge-E2E-Tests | {Full/Partial/Gap/N/A} | {test name or recommendation} |
+| Mobile (WebdriverIO) | HealthBridge-Mobile-Tests | {Full/Partial/Gap/N/A} | {test name or recommendation} |
+
+</details>
+```
 
 ---
 
-**Constraints:**
+## Constraints
+
 - **Max 900 words** total report length
-- **Code snippets:** 5-10 lines (Section 4 defect snippet) / 3-5 lines (Section 7 fix snippet)
+- **Code snippets:** 5-10 lines (Section 4 defect) / 3-5 lines (Section 7 fix)
 - **file:line references** required for all code mentions
-- **Severity must be justified** against the criteria table, not just assigned
-- **Steps to reproduce** must be numbered, specific, and independently reproducible
-- **Root cause** must reference actual code, not speculation
-- **Confidence level** must be stated in Section 4
+- **Severity justified** against severity-criteria.md
+- **Repro steps** numbered, specific, independently reproducible
+- **Root cause** references actual code, not speculation
+- **Confidence level** stated in Section 4
+
+## Output Location
+
+`reports/bug-report/<TICKET-ID>-bug-report.md`
+(or `reports/bug-report/<ERROR-TYPE>-<DATE>-bug-report.md` if no ticket ID)

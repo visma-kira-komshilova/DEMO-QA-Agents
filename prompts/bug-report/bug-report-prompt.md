@@ -1,491 +1,176 @@
 # Bug Report Analysis Prompt
 
-You are analyzing an error or exception to generate a ticket-ready bug report. This document provides detailed analysis instructions.
+You are analyzing an error or exception to generate a ticket-ready bug report. Follow this analysis framework for each phase.
 
 ---
 
-## Analysis Framework
-
-### Phase 1: Error Classification (2-3 minutes)
+## Phase 1: Error Classification
 
 **Input Types:**
-1. **Stack Trace** - Full exception with file:line references
-2. **Error Message Only** - User-reported error text
-3. **Symptom Description** - Behavior without technical details
-4. **Code Issue** - Developer-reported code problem
+1. **Stack Trace** — Full exception with file:line references
+2. **Error Message Only** — User-reported error text
+3. **Symptom Description** — Behavior without technical details
+4. **Code Issue** — Developer-reported code problem
 
-**First Actions:**
-```
-1. Identify error type (NullRef, IndexOut, Logic, etc.)
+**Actions:**
+1. Identify error type (NullRef, IndexOut, Logic, Auth, etc.)
 2. Extract file path and line number (if available)
-3. Determine repository (HealthBridge-Web, HealthBridge-Portal, HealthBridge-Api, HealthBridge-Mobile, HealthBridge-Claims-Processing, HealthBridge-Prescriptions-Api)
-4. Select correct pattern table based on repository (see Step 2 below)
-5. Check branch/version context
-```
+3. Determine repository from namespace/stack trace:
+
+| Error Pattern | Repository | Technology |
+|---------------|------------|------------|
+| `*.cs`, Web namespace | `HealthBridge-Web` | C# / ASP.NET Core |
+| `*.cs`, Portal namespace | `HealthBridge-Portal` | C# / .NET Core |
+| `*.dart`, Flutter stack | `HealthBridge-Mobile` | Flutter / Dart |
+| `*.cs`, Api namespace | `HealthBridge-Api` | C# / .NET Core |
+| Claims, insurance processing | `HealthBridge-Claims-Processing` | C# / .NET Core |
+| Prescriptions namespace | `HealthBridge-Prescriptions-Api` | C# / .NET Core |
+| Browser/client error | `HealthBridge-Web` (WebInterface) | ASP.NET Core |
+
+4. Select correct pattern table from `context/historical-bugfix-patterns.md`
 
 ---
 
-### Phase 2: Code Location (3-5 minutes)
+## Phase 2: Code Location
 
 **If Stack Trace Available:**
 ```bash
-# Parse stack trace for file:line
-# Example: "at PrescriptionService.cs:line 234"
-
 cd <repository-path>
-# Read the file
-Read: <file-path> lines <line-20> to <line+20>
+# Read the file at error location (+/- 20 lines)
 ```
 
 **If Error Message Only:**
 ```bash
-# Search for error message in codebase (use remote refs)
 git grep -n "<error message>" origin/main -- "*.cs" "*.ts" "*.dart"
 ```
 
 **If Symptom Description Only:**
 ```bash
-# Search for related code by feature keywords
-git grep -n "<feature name>" origin/main -- "*.cs"
-
-# Example: "prescription creation validation"
+git grep -n "<feature keyword>" origin/main -- "*.cs"
 ```
 
 ---
 
-### Phase 3: Root Cause Analysis (8-11 minutes)
+## Phase 3: Root Cause Analysis
 
-#### Step 1: Read and Understand Code
+### Step 1: Read and Understand Code
 
-**Context Window:**
 - Read +/-20 lines around error line
-- Understand function purpose
-- Check input parameters
+- Understand function purpose and input parameters
 - Trace data flow
+- Look for: missing null checks, incorrect conditions, boundary issues, unhandled edge cases, logic errors
 
-**Look For:**
-- Missing null checks
-- Incorrect conditions
-- Boundary condition issues
-- Unhandled edge cases
-- Logic errors
+### Step 2: Match Hotfix Pattern
 
-#### Step 2: Match Hotfix Pattern
+Read `context/historical-bugfix-patterns.md` and use the routing table to select the correct pattern table. Common indicators:
 
-**Read `context/historical-bugfix-patterns.md`** for all repository-specific pattern tables. Use the routing table to select the correct patterns for the identified repository.
+- **NULL Handling:** NullReferenceException, accessing properties without null check
+- **Edge Cases:** IndexOutOfRangeException, empty collections, date boundaries
+- **Authorization:** Unauthorized access, role bypass, missing access control
+- **Logic/Condition:** Wrong operators (`&&` vs `||`), wrong variable, copy-paste errors
+- **Data Validation:** Invalid formats, type conversion failures
+- **Missing Implementation:** NotImplementedException, TODO comments, stubs
 
-Match the bug's symptoms against patterns from the correct table. Common indicators across all repos:
-- **NULL Handling:** NullReferenceException, "Object reference not set", accessing properties without null check
-- **Edge Cases:** IndexOutOfRangeException, empty collection errors, date boundary issues, min/max value problems
-- **Authorization:** Unauthorized access, role-based permission bypass, missing access control checks
-- **Logic/Condition:** Incorrect operators (&& vs ||), wrong variable used, copy-paste errors
-- **Data Validation:** Invalid data formats, missing format validation, type conversion failures
-
-**Missing Implementation** (see `context/historical-bugfix-patterns.md` for repo-specific %):
-```
-Indicators:
-- NotImplementedException
-- TODO comments
-- Stub methods
-- Incomplete features
-
-Detection:
-throw new NotImplementedException();  // Not implemented
-// TODO: Implement this  // Incomplete
-```
-
-#### Step 3: Git History Check
+### Step 3: Git History Check
 
 ```bash
-# When was this code added? (use remote refs — never local)
 git log origin/main --oneline -n 10 -- "<file-path>"
-
-# Who last changed this line?
 git blame origin/main -- "<file-path>" -L <line>,<line>
-
-# Search for similar past errors/fixes
 git log --all --grep="<error-type>" --oneline
 ```
 
-**Questions to Answer:**
-- Is this new code or legacy?
-- Was it recently changed? (potential regression)
-- Are there similar past issues?
-- What PR introduced this code?
+Answer: Is this new or legacy code? Recently changed (regression)? Similar past issues?
 
-#### Step 4: Search Codebase for Similar Patterns
+### Step 4: Codebase Pattern Search (CRITICAL)
 
-**CRITICAL:** Search for the same bug pattern elsewhere in the codebase.
+Search for the same bug pattern elsewhere:
 
 ```bash
-# Search for similar code structure on remote (never local grep)
 git grep -n "problematic_pattern" origin/main -- "*.cs" "*.ts" "*.dart"
-
-# Find similar function calls
 git grep -n "SuspiciousMethod(" origin/main
-
-# Search for copy-paste candidates (similar file names)
-git ls-tree -r --name-only origin/main | grep -E "(Service)\.(cs|ts)$"
 ```
 
-**Search for conceptual similarity:**
-```bash
-# Find similar code patterns on remote
-git grep -n "<problematic_pattern>" origin/main -- "*.cs"
-```
-
-**Find all callers of the problematic method:**
-```bash
-git grep -n "<method_name>" origin/main -- "*.cs"
-```
-
-**Questions to Answer:**
-1. **Same bug elsewhere?** - Does this pattern exist in other files?
-2. **How many occurrences?** - Is this isolated or systemic?
-3. **Copy-paste origin?** - Did someone copy this buggy code?
-4. **Shared code?** - Is the buggy code in a base class/shared utility?
-
-**Examples:**
-- NULL error in `PrescriptionService.GetDosage()` -> Search all `*Service.cs` files for `.GetDosage()` without null check
-- Index error in `items[0]` -> Search for `items[0]` without `items.Count > 0` check
-- Missing auth check -> Search for other endpoints without `[Authorize]` attributes
-
-**Expected Output:**
-- Found in 5 other files: [list files]
-- Isolated to this file only
-- Used by 12 callers: [potential impact scope]
-
-**Time Budget:** 2-4 minutes
+Determine:
+1. Same bug elsewhere? How many occurrences?
+2. Copy-paste origin? Shared base class/utility?
+3. Isolated or systemic?
 
 ---
 
-### Phase 4: Severity Assessment (2-3 minutes)
+## Phase 4: Severity Assessment
 
-Use the severity matrix from `severity-criteria.md`:
+**Apply criteria from `severity-criteria.md`.** Quick reference:
 
-#### Critical
-**Criteria (ANY of these):**
-- Production completely down
-- Data loss or corruption
-- Security breach (SQL injection, XSS, auth bypass)
-- >50% of users affected
-- Patient safety risk (wrong medication, incorrect dosage)
-- Regulatory/HIPAA compliance violation
+| Severity | Priority | Key Criteria |
+|----------|----------|--------------|
+| Critical | P1 | Data loss, security breach, system unavailable, >50% users, HIPAA/patient safety |
+| High | P2 | Core feature broken, >10% users, data integrity risk, workaround exists but complex |
+| Medium | P3 | Non-critical feature broken, <10% users, easy workaround |
+| Low | P4 | Cosmetic, no functional impact |
 
-**Examples:**
-- Database delete without where clause
-- Authentication bypass exposing patient records
-- Prescription dosage calculation wrong
-- Cannot log in (all users)
+**Assessment questions:** Can users complete their task? Is patient data at risk? How many affected? Workaround available? Clinical feature?
 
-#### High
-**Criteria (ANY of these):**
-- Core feature completely broken
-- 10-50% of users affected
-- Data integrity risk (but no actual loss yet)
-- Workaround exists but complex
-- Medical records showing incorrect data
-
-**Examples:**
-- Patient record creation crashes
-- Lab result display shows wrong values
-- Appointment scheduling fails for certain date ranges
-- Major clinical feature unusable
-
-#### Medium
-**Criteria (ANY of these):**
-- Non-critical feature broken
-- 1-10% of users affected
-- Easy workaround available
-- UI/UX issue affecting workflow
-- Performance degradation (not critical)
-
-**Examples:**
-- Secondary report fails
-- UI button not working (alternative exists)
-- Slow page load (not timeout)
-- Export format incorrect
-
-#### Low
-**Criteria (ANY of these):**
-- Cosmetic issue
-- <1% of users affected
-- Minor UI inconsistency
-- Typo or text issue
-- Enhancement rather than bug
-
-**Examples:**
-- Button alignment off
-- Tooltip text wrong
-- Console warning (no user impact)
-- Minor performance improvement needed
-
-#### Assessment Questions
-
-Ask yourself:
-1. **Can users complete their task?** (No = Higher severity)
-2. **Is patient data at risk?** (Yes = Higher severity)
-3. **How many users affected?** (More = Higher severity)
-4. **Is workaround available?** (No = Higher severity)
-5. **What feature is broken?** (Clinical feature = Higher severity)
+For detailed criteria, decision tree, escalation rules, and edge cases → read `severity-criteria.md`.
 
 ---
 
-### Phase 5: Test Coverage Analysis (2-3 minutes)
+## Phase 5: Test Coverage Analysis
 
-#### Check Unit Tests
-
+### Unit Tests
 ```bash
-# Find test files for the affected class (use remote refs)
 git ls-tree -r --name-only origin/main | grep -E "(Test|Tests)\.(cs|dart)$"
-
-# Search for test methods
 git grep -n "Test<FunctionName>" origin/main -- "*Test*"
 ```
 
-**Assessment:**
-- **Exist** - Tests cover this functionality
-- **Partial** - Some tests exist but not for this case
-- **Missing** - No tests for this function
+Assessment: **Exist** / **Partial** / **Missing**
 
-#### Check E2E Coverage
+### E2E Tests
 
-Use `context/e2e-test-coverage-map.md`:
+Consult `context/e2e-test-coverage-map.md` for framework mapping. Fetch all E2E repos per CLAUDE.md protocol, then keyword-first search:
 
-```
-1. Identify functional area (e.g., "Prescription Creation")
-2. Check coverage map - which framework covers it?
-3. Search relevant E2E repo for tests
+```bash
+git grep -n "<feature-keyword>" origin/main -- "*.py"       # Selenium
+git grep -n "<feature-keyword>" origin/main -- "*.spec.ts"  # Playwright
+git grep -n "<feature-keyword>" origin/main -- "*.js"       # Mobile
 ```
 
-**Frameworks (consult `context/e2e-test-coverage-map.md` for full mapping):**
-- **Selenium** - Patient Records, Prescriptions, Insurance Claims, Billing
-- **Playwright** - Appointments, Scheduling, Lab Results, Staff Scheduling
-- **Mobile** - Appointments, Lab Results, Medication Tracking, Mobile UI
+**Selenium row assignment:** `HBIntegrationTests/` → Selenium Integration row. All other folders → Selenium UI row.
 
-#### Automation Priority
+### Automation Priority
 
-Determine if this should be automated:
-
-**High Priority:**
-- Core clinical feature
-- Patient safety calculation
-- Data integrity
-- High regression risk
-- Affects many users
-
-**Medium Priority:**
-- Secondary feature
-- UI validation
-- Edge case
-- Medium regression risk
-
-**Low Priority:**
-- Cosmetic issue
-- Rare edge case
-- Low user impact
-- One-time issue
+| Priority | Indicators |
+|----------|-----------|
+| High | Core clinical feature, patient safety, data integrity, high regression risk |
+| Medium | Secondary feature, UI validation, edge case |
+| Low | Cosmetic, rare edge case, one-time issue |
 
 ---
 
-### Phase 6: Fix Recommendation (3-5 minutes)
+## Phase 6: Fix Recommendation
 
-#### Complexity Assessment
+Generate 3 fix options:
 
-**Simple Fix (1-2 hours):**
-- Add null check
-- Fix typo
-- Add validation
-- Correct simple logic
+| Option | Scope | Effort | Risk |
+|--------|-------|--------|------|
+| **Quick Fix** | Minimal change, address symptom | Low (1-2h) | Medium (may not address root cause) |
+| **Proper Fix** | Address root cause in component | Medium (4-8h) | Low (targeted) |
+| **Comprehensive Fix** | Root cause + all similar patterns | High (8-16h) | Very Low (prevents recurrence) |
 
-**Medium Fix (0.5-1 day):**
-- Refactor function
-- Add comprehensive validation
-- Fix multiple related issues
-- Update multiple files
-
-**Complex Fix (1-3 days):**
-- Architectural change
-- Database schema change
-- Cross-component fix
-- Major refactoring
-
-**Very Complex (>3 days):**
-- Major redesign
-- Performance optimization
-- Migration required
-- Breaking API changes
-
-#### Fix Approach
-
-**Template:**
-```
-1. Identify exact change needed
-2. List files to modify
-3. Provide code example (3-5 lines)
-4. List prevention measures
-```
-
-**Example for NULL Handling:**
-```csharp
-// Before (buggy)
-var patientId = record.Patient.ID;
-
-// After (fixed)
-if (record.Patient == null)
-{
-    return Result.Failure("Patient record required");
-}
-var patientId = record.Patient.ID;
-```
-
-#### Prevention Measures
-
-Always include 3 prevention measures:
-
-1. **Testing:** Specific unit/E2E test to add
-2. **Code Review:** Checklist item for reviews
-3. **Validation:** Client/server validation to add
-
-**Example:**
-```
-Prevention:
-- [ ] Add unit test: TestSavePrescription_NullPatient_ReturnsError()
-- [ ] Code review item: "Check for null before property access"
-- [ ] Add client-side validation to prevent null submission
-```
+For each option, provide specific code-level guidance. Include a code snippet for the recommended option (3-5 lines).
 
 ---
 
-### Phase 7: Report Generation (5-10 minutes)
+## Phase 7: Report Generation
 
-Use the template from `bug-report-template.md`.
+Use `bug-report-template.md`. Follow these guidelines:
 
-#### Writing Guidelines
+**Be Specific:** "Add null check at PrescriptionService.cs:234" not "Fix the error"
+**Be Concise:** Bullet points, short sentences, clear structure
+**Be Actionable:** Exact file:line, code fix, specific tests, numbered repro steps
 
-**Be Specific:**
-- "Fix the error" -> "Add null check at PrescriptionService.cs:234"
-- "Many users affected" -> "~20% of users (those who create prescriptions without patient selection)"
-- "Should validate input" -> "Should display error: 'Patient selection is mandatory'"
+### Ticket Field Auto-Detection
 
-**Be Concise:**
-- Use bullet points
-- Short sentences
-- Clear structure
-- No unnecessary words
-
-**Be Actionable:**
-- Provide exact file:line
-- Show code fix
-- List specific tests
-- Give reproduction steps
-
-#### Word Count Management
-
-**Target: 900 words**
-
-If over limit:
-1. Shorten code snippets (5 lines max)
-2. Remove redundant explanations
-3. Use tables instead of prose
-4. Combine related points
-
-**Section Priorities:**
-1. Steps to Reproduce (must be clear)
-2. Root Cause (must be specific)
-3. Fix Recommendation (must be actionable)
-4. Impact Assessment (must be realistic)
-5. Everything else (trim if needed)
-
----
-
-## Error-Specific Analysis Patterns
-
-### NullReferenceException
-
-**Quick Checklist:**
-- [ ] Where is null check missing?
-- [ ] What object is null?
-- [ ] Is it optional parameter?
-- [ ] Is it user input?
-- [ ] Should it ever be null?
-
-**Pattern:** NULL Handling (see `context/historical-bugfix-patterns.md` for repo-specific %)
-
-**Typical Fix:**
-```csharp
-if (obj == null)
-{
-    // Handle null case
-    return Result.Failure("Required data missing");
-}
-```
-
-### IndexOutOfRangeException
-
-**Quick Checklist:**
-- [ ] Is collection empty?
-- [ ] Is index calculation wrong?
-- [ ] Is boundary check missing?
-- [ ] Off-by-one error?
-
-**Pattern:** Edge Cases (see `context/historical-bugfix-patterns.md` for repo-specific %)
-
-**Typical Fix:**
-```csharp
-if (collection.Count > 0 && index < collection.Count)
-{
-    // Access collection safely
-}
-```
-
-### Logic Errors
-
-**Quick Checklist:**
-- [ ] Is condition correct (&& vs ||)?
-- [ ] Is comparison right (> vs >=)?
-- [ ] Wrong variable used?
-- [ ] Copy-paste error?
-
-**Pattern:** Logic/Condition Errors (see `context/historical-bugfix-patterns.md` for repo-specific %)
-
-**Typical Fix:**
-```csharp
-// Before
-if (x > 0 && y < 0)  // Should be ||
-
-// After
-if (x > 0 || y < 0)  // Correct logic
-```
-
-### Authorization Errors
-
-**Quick Checklist:**
-- [ ] Is there an authorization attribute?
-- [ ] Are all roles handled?
-- [ ] Is department-level access enforced?
-- [ ] Is data-level authorization checked?
-
-**Pattern:** Authorization Gaps (see `context/historical-bugfix-patterns.md` for repo-specific %)
-
-**Typical Fix:**
-```csharp
-[Authorize(Roles = "Doctor,Nurse")]
-public async Task<IActionResult> GetPatientRecord(int patientId)
-{
-    if (!await _authService.CanAccessPatient(User, patientId))
-        return Forbid();
-    // ...
-}
-```
-
----
-
-## Ticket Field Auto-Detection
-
-### Component Detection
-
-Use file path to auto-detect component:
+**Component** — derive from file path:
 
 | Path Pattern | Component |
 |--------------|-----------|
@@ -500,131 +185,42 @@ Use file path to auto-detect component:
 | `*/api/*` | API |
 | `*/mobile/*` | Mobile |
 
-### Label Generation
+**Labels** — auto-generate from:
+- Pattern: `null-handling`, `edge-case`, `authorization-gap`, `logic-error`, `data-validation`, `missing-implementation`
+- Area: `prescription`, `patient-record`, `appointment`, `billing`, `lab-results`
+- Severity: `critical-severity`, `high-severity`, `medium-severity`, `low-severity`
 
-Auto-generate labels based on:
+### Section 9 Manual Scenarios
 
-**Hotfix Pattern:**
-- `null-handling`
-- `edge-case`
-- `authorization-gap`
-- `logic-error`
-- `data-validation`
-- `missing-implementation`
+Derive 3 scenarios: (1) primary bug reproduction, (2) edge case from matched pattern category, (3) negative/validation test.
 
-**Area:**
-- `prescription`
-- `patient-record`
-- `appointment`
-- `billing`
-- `lab-results`
-- etc.
+### Confidence Levels
 
-**Severity:**
-- `critical-severity`
-- `high-severity`
-- `medium-severity`
-- `low-severity`
+State confidence in root cause analysis:
 
-**Type:**
-- `validation-error`
-- `calculation-error`
-- `ui-error`
-- `performance-issue`
-
-### Priority Mapping
-
-| Severity | Priority |
-|----------|----------|
-| Critical | P1 |
-| High | P2 |
-| Medium | P3 |
-| Low | P4 |
+| Level | Range | Indicators |
+|-------|-------|-----------|
+| High | 90-100% | Clear stack trace, obvious issue, easy to reproduce, similar past issues |
+| Medium | 60-89% | Error located but complex logic, multiple potential causes, intermittent |
+| Low | 30-59% | No stack trace, complex system interaction, cannot reproduce reliably |
 
 ---
 
-## Quality Assurance
+## Pre-Submission Checklist
 
-### Before Submitting Report
+Before submitting, verify ALL:
 
-**Technical Accuracy:**
-- [ ] File paths are correct
-- [ ] Line numbers are accurate
-- [ ] Code snippets are valid syntax
-- [ ] Root cause explanation makes sense
-
-**Clarity:**
-- [ ] Steps to reproduce are numbered and clear
-- [ ] Expected vs Actual is unambiguous
-- [ ] Fix recommendation is actionable
-- [ ] Technical terms explained if needed
-
-**Completeness:**
-- [ ] All mandatory sections filled
-- [ ] Severity justified
-- [ ] Test data requirements specific
-- [ ] Related issues searched
-
-**Professional:**
-- [ ] No typos
-- [ ] Proper formatting
-- [ ] Ticket-ready language
-- [ ] Word count <= 900
-
----
-
-## Time Budget
-
-Total time: 25-35 minutes
-
-- **Phase 1** (Classification): 2-3 min
-- **Phase 2** (Location): 3-5 min
-- **Phase 3** (Root Cause + Pattern Search): 8-11 min
-- **Phase 4** (Severity): 2-3 min
-- **Phase 5** (Test Coverage): 2-3 min
-- **Phase 6** (Fix Recommendation): 3-5 min
-- **Phase 7** (Report Writing): 5-10 min
-
-If taking longer:
-- Focus on essentials (Sections 1-6)
-- Skip optional sections (screenshots, logs)
-- Use template structure strictly
-- Don't over-analyze
-
----
-
-## Confidence Levels
-
-Always indicate confidence in root cause analysis:
-
-**High Confidence (90-100%):**
-- Clear stack trace to exact line
-- Obvious issue (missing null check)
-- Easy to reproduce
-- Similar past issues found
-
-**Medium Confidence (60-90%):**
-- Error located but logic complex
-- Multiple potential causes
-- Intermittent issue
-- Needs more investigation
-
-**Low Confidence (30-60%):**
-- Error message only, no stack trace
-- Complex system interaction
-- Cannot reproduce reliably
-- Insufficient information
-
-**Example:**
-```
-Root Cause (Medium Confidence - 70%):
-The error likely occurs due to missing null check at line 234,
-but the intermittent nature suggests there may be a race condition
-or timing issue that requires further investigation.
-```
+- [ ] All 9 sections completed per template
+- [ ] JIRA fields populated (Summary ≤80 chars, Component, Severity, Labels, Affects Version)
+- [ ] Severity justified against criteria
+- [ ] Correct pattern table used for repository
+- [ ] Root cause with code snippet (5-10 lines) and confidence level
+- [ ] Codebase searched for similar patterns — scope reported (isolated vs cluster)
+- [ ] 3 fix options with recommended option and code snippet (3-5 lines)
+- [ ] Repro steps numbered and specific
+- [ ] E2E table has 4 rows (Selenium UI, Selenium Integration, Playwright, Mobile)
+- [ ] Word count ≤ 900
 
 ---
 
 **File Location:** `prompts/bug-report/bug-report-prompt.md`
-
-*Follow this analysis framework for consistent, high-quality bug reports.*
