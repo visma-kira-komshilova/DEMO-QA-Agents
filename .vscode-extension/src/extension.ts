@@ -15,19 +15,19 @@ interface AgentConfig {
 
 const AGENTS: AgentConfig[] = [
     {
-        id: 'hb-qa-acceptance-tests',
+        id: 'hb-acceptance-tests',
         name: 'Acceptance Tests',
-        promptFile: 'qa-acceptance-tests.md'
+        promptFile: 'acceptance-tests.md'
     },
     {
-        id: 'hb-qa-code-review',
+        id: 'hb-code-review',
         name: 'Code Review',
-        promptFile: 'qa-code-review.md'
+        promptFile: 'code-review.md'
     },
     {
-        id: 'hb-qa-bug-report',
+        id: 'hb-bug-report',
         name: 'Bug Report',
-        promptFile: 'qa-bug-report.md'
+        promptFile: 'bug-report.md'
     },
     {
         id: 'hb-bugfix-rca',
@@ -45,9 +45,14 @@ const AGENTS: AgentConfig[] = [
         promptFile: 'release-analysis.md'
     },
     {
-        id: 'hb-qa-feedback',
-        name: 'QA Feedback',
-        promptFile: 'qa-feedback.md'
+        id: 'hb-feedback',
+        name: 'Feedback',
+        promptFile: 'feedback.md'
+    },
+    {
+        id: 'hb-setup',
+        name: 'Project Setup',
+        promptFile: 'setup.md'
     }
 ];
 
@@ -427,7 +432,7 @@ export function activate(context: vscode.ExtensionContext) {
         context.subscriptions.push(participant);
     }
 
-    vscode.window.showInformationMessage('✅ HealthBridge QA Agents loaded! Use @hb-qa-code-review, @hb-bugfix-rca, etc. in chat');
+    vscode.window.showInformationMessage('✅ HealthBridge QA Agents loaded! Use @hb-code-review, @hb-bugfix-rca, etc. in chat');
 }
 
 export function deactivate() {}
