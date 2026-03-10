@@ -19,7 +19,8 @@
 
 ---
 
-## Finding N: <Pattern Category> (<Hotfix %>) -- <Specific Issue Title>
+<details>
+<summary><strong>Finding N: <Pattern Category> (<Hotfix %>) -- <Specific Issue Title></strong> | <code>file:line-range</code> | Risk: <code>Low/Medium/High</code></summary>
 
 **Location:** `<file:line-range>`
 
@@ -71,13 +72,18 @@
 
 **Severity: Low/Medium/High.** [One-sentence justification linking probability, impact, and fix cost.]
 
+</details>
+
 ---
 
-## Summary
+<details>
+<summary><strong>Summary</strong> | <code>N findings</code></summary>
 
 | # | Finding | Probability | Impact | Risk | Key Issue |
 |---|---------|-------------|--------|------|-----------|
 | N | [Title] | Low/Med/High | Low/Med/High | Low/Med/High | [One-line summary] |
+
+</details>
 ```
 
 ---

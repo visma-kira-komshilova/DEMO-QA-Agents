@@ -53,7 +53,8 @@ This template defines the structure and format for development effort estimation
 
 ---
 
-## 1. Estimation Summary
+<details>
+<summary><strong>1. Estimation Summary</strong> | <code>X.X hours (~X.X days)</code> | Complexity: <code>Low/Medium/High/Very High</code></summary>
 
 **Impacted Repositories:**
 - [Repository 1 - e.g., HealthBridge-Web]
@@ -67,13 +68,17 @@ This template defines the structure and format for development effort estimation
 - [Risk 1 - e.g., Database migration with zero-downtime requirement]
 - [Risk 2 - e.g., Multi-repository coordination needed]
 
+</details>
+
 ---
 
-## 2. Repository-by-Repository Breakdown
+<details>
+<summary><strong>2. Repository-by-Repository Breakdown</strong> | <code>N repos impacted</code></summary>
 
 **ONLY include repositories that are IMPACTED (identified in requirements analysis)**
 
-### 2.1 HealthBridge-Web (C# / ASP.NET Core)
+<details>
+<summary><strong>2.1 HealthBridge-Web</strong> (C# / ASP.NET Core) | Impact: <code>High/Medium/Low</code> | <code>X.X hours</code></summary>
 
 **Impact Level:** High / Medium / Low / None
 
@@ -129,9 +134,12 @@ This template defines the structure and format for development effort estimation
 
 **HealthBridge-Web Total:** [X.X hours]
 
+</details>
+
 ---
 
-### 2.2 HealthBridge-Api (C# / .NET Core)
+<details>
+<summary><strong>2.2 HealthBridge-Api</strong> (C# / .NET Core) | Impact: <code>High/Medium/Low</code> | <code>X.X hours</code></summary>
 
 **Impact Level:** High / Medium / Low / None
 
@@ -179,9 +187,12 @@ This template defines the structure and format for development effort estimation
 
 **HealthBridge-Api Total:** [X.X hours]
 
+</details>
+
 ---
 
-### 2.3 HealthBridge-Mobile (Flutter / Dart)
+<details>
+<summary><strong>2.3 HealthBridge-Mobile</strong> (Flutter / Dart) | Impact: <code>High/Medium/Low</code> | <code>X.X hours</code></summary>
 
 **Impact Level:** High / Medium / Low / None
 
@@ -237,9 +248,12 @@ This template defines the structure and format for development effort estimation
 
 **HealthBridge-Mobile Total:** [X.X hours]
 
+</details>
+
 ---
 
-### 2.4 HealthBridge-Portal (C# / .NET Core + React)
+<details>
+<summary><strong>2.4 HealthBridge-Portal</strong> (C# / .NET Core + React) | Impact: <code>High/Medium/Low</code> | <code>X.X hours</code></summary>
 
 **Impact Level:** High / Medium / Low / None
 
@@ -279,9 +293,14 @@ This template defines the structure and format for development effort estimation
 
 **HealthBridge-Portal Total:** [X.X hours]
 
+</details>
+
+</details>
+
 ---
 
-## 3. Cross-Repository Tasks
+<details>
+<summary><strong>3. Cross-Repository Tasks</strong> | <code>X.X hours</code></summary>
 
 _(Skip this section if feature is contained within a single repository.)_
 
@@ -313,9 +332,12 @@ _(Skip this section if feature is contained within a single repository.)_
 
 **Cross-Repository Total:** [X.X hours]
 
+</details>
+
 ---
 
-## 4. DevOps & Infrastructure Tasks
+<details>
+<summary><strong>4. DevOps & Infrastructure Tasks</strong> | <code>X.X hours</code></summary>
 
 _(Skip this section if no feature flags, CI/CD, config, or monitoring changes needed.)_
 
@@ -325,9 +347,12 @@ _(Skip this section if no feature flags, CI/CD, config, or monitoring changes ne
 
 **DevOps Total:** [X.X hours]
 
+</details>
+
 ---
 
-## 5. Documentation Tasks
+<details>
+<summary><strong>5. Documentation Tasks</strong> | <code>X.X hours</code></summary>
 
 _(Skip this section if no documentation changes needed.)_
 
@@ -337,9 +362,12 @@ _(Skip this section if no documentation changes needed.)_
 
 **Documentation Total:** [X.X hours]
 
+</details>
+
 ---
 
-## 6. Testing & Quality Assurance Tasks
+<details>
+<summary><strong>6. Testing & Quality Assurance Tasks</strong> | <code>X.X hours</code></summary>
 
 _(Skip this section if dev-side testing effort is negligible.)_
 
@@ -350,9 +378,12 @@ _(Skip this section if dev-side testing effort is negligible.)_
 
 **Testing & QA Total:** [X.X hours]
 
+</details>
+
 ---
 
-## 7. Risk & Contingency
+<details>
+<summary><strong>7. Risk & Contingency</strong> | <code>X.X hours buffer</code></summary>
 
 ### 7.1 Known Risks
 
@@ -378,9 +409,12 @@ _(Skip this section if dev-side testing effort is negligible.)_
 
 **Total with Buffer:** [Base + Risk + Complexity = X.X] hours
 
+</details>
+
 ---
 
-## 8. Total Development Estimate Summary
+<details>
+<summary><strong>8. Total Development Estimate Summary</strong> | <code>X.X hours (~X.X days)</code></summary>
 
 | Category | Estimate (Hours) | % of Total | Notes |
 |----------|------------------|------------|-------|
@@ -407,9 +441,12 @@ _(Include only rows for impacted categories. Remove rows with 0h.)_
 **Parallel Timeline:** [X.X] days (optimal team assignment)
 **Recommended Team Size:** [X] developers
 
+</details>
+
 ---
 
-## 9. Estimation Confidence & Assumptions
+<details>
+<summary><strong>9. Estimation Confidence & Assumptions</strong> | Confidence: <code>High/Medium/Low</code></summary>
 
 ### 9.1 Confidence Level
 
@@ -436,9 +473,12 @@ _(Include only rows for impacted categories. Remove rows with 0h.)_
 
 _(If approaching 1500-word limit, abbreviate Section 9 to 9.1 only.)_
 
+</details>
+
 ---
 
-## 10. Parallelization Notes
+<details>
+<summary><strong>10. Parallelization Notes</strong> | <code>N workstreams</code></summary>
 
 _(Skip if single-developer or single-repo feature.)_
 
@@ -453,6 +493,8 @@ _(Skip if single-developer or single-repo feature.)_
 | Task Group | Can Run in Parallel With | Dependency |
 |------------|--------------------------|------------|
 | [group] | [group] | [blocker, if any] |
+
+</details>
 
 ---
 

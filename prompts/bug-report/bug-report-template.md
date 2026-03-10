@@ -153,12 +153,17 @@ Output format for bug report documents. For analysis logic, see `bug-report-prom
 
 ### E2E Automation Gaps
 
+**If E2E automation is configured:**
+
 | Framework | Repository | Coverage | Recommendation |
 |-----------|------------|----------|----------------|
 | Selenium UI (Python) | HealthBridge-Selenium-Tests | {Full/Partial/Gap/N/A} | {test name or recommendation} |
 | Selenium Integration (Python) | HealthBridge-Selenium-Tests | {Full/Partial/Gap/N/A} | {test name or recommendation} |
 | Playwright (TypeScript) | HealthBridge-E2E-Tests | {Full/Partial/Gap/N/A} | {test name or recommendation} |
 | Mobile (WebdriverIO) | HealthBridge-Mobile-Tests | {Full/Partial/Gap/N/A} | {test name or recommendation} |
+
+**If NO E2E automation (Q4.1 = "none"):**
+> N/A — No E2E test automation configured for this project.
 
 </details>
 ```

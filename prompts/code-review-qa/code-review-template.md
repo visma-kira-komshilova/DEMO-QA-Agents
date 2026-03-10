@@ -90,6 +90,8 @@ Output format for comprehensive code review reports. For analysis logic, see `co
 
 ### 4.2 E2E Automation Impact
 
+**If E2E automation is configured:**
+
 **E2E Test Repositories:**
 - **Selenium:** `HealthBridge-Selenium-Tests/` (Python) — UI + Integration/API
 - **Playwright:** `HealthBridge-E2E-Tests/` (TypeScript)
@@ -110,6 +112,9 @@ Output format for comprehensive code review reports. For analysis logic, see `co
 | Playwright | [#] | [#] | [#] | [hours] |
 | Mobile | [#] | [#] | [#] | [hours] |
 | **TOTAL** | | | | **[hours]** |
+
+**If NO E2E automation (Q4.1 = "none"):**
+> N/A — No E2E test automation configured for this project.
 
 ### 4.3 Test Data Requirements
 

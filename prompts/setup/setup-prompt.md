@@ -328,6 +328,92 @@ reports/requirements-analysis/
 
 Add `.gitkeep` to each empty directory.
 
+### 2.5 No-E2E Mode
+
+**When Q4.1 answer is "none" (no E2E test frameworks), apply the following adjustments:**
+
+#### 2.5.1 Context File: `context/e2e-test-coverage-map.md`
+
+Generate a simplified version instead of the full framework-based coverage map:
+
+```markdown
+# E2E Test Coverage Map
+
+**Status:** No E2E test automation is currently configured for this project.
+
+## Functional Areas
+
+Reference table for manual test planning. When E2E automation is added later, use this to track coverage.
+
+| Functional Area | Manual Test Priority | Notes |
+|-----------------|---------------------|-------|
+| <domain-1> | High / Medium / Low | [Add notes] |
+| <domain-2> | High / Medium / Low | [Add notes] |
+...
+
+## Adding E2E Automation Later
+
+When you add E2E test automation:
+1. Re-run setup (`@<prefix>-setup`) and provide framework details for Q4.1/Q4.2
+2. Or manually update this file with framework columns and the CLAUDE.md E2E sections
+3. Update report templates to use the framework-specific E2E coverage tables
+```
+
+#### 2.5.2 CLAUDE.md E2E Sections
+
+Replace all framework-specific E2E instructions with no-E2E equivalents:
+
+- **"E2E Framework Selection by Functional Area"** section — Replace with:
+  ```
+  **No E2E test automation repositories are configured for <project-name>.** E2E coverage analysis is not available.
+
+  Report "N/A — No E2E automation configured" for all E2E coverage sections in every agent report.
+  ```
+
+- **"E2E Test Search Strategy"** section — Replace with:
+  ```
+  **No E2E test automation repositories are configured for <project-name>.** Skip all E2E search steps. Report "N/A — No E2E automation" in coverage tables.
+  ```
+
+- **"E2E Repository — Fetch Latest Before Coverage Analysis"** section — Replace with:
+  ```
+  **No E2E test automation repositories are configured.** Skip E2E fetch and coverage analysis steps. Report "N/A — No E2E automation configured" for all E2E coverage sections.
+  ```
+
+- Remove E2E test repositories from the **Multi-Repository Workspace** table (keep only application repos).
+
+#### 2.5.3 Report Templates — E2E Coverage Tables
+
+In ALL template files that contain the 4-row framework coverage table (Selenium UI / Selenium Integration / Playwright / Mobile), replace with a conditional block:
+
+```markdown
+**If E2E automation is configured:**
+[4-row framework table populated from collected answers]
+
+**If NO E2E automation (Q4.1 = "none"):**
+> N/A — No E2E test automation configured for this project.
+```
+
+Affected template files:
+- `prompts/code-review-qa/code-review-template.md` (Section 4.2)
+- `prompts/bugfix-rca/bugfix-rca-e2e-template.md` (Section 2)
+- `prompts/acceptance-tests/acceptance-tests-template.md` (E2E Coverage section)
+- `prompts/bug-report/bug-report-template.md` (E2E section)
+
+#### 2.5.4 Prompt Validation Checklists
+
+In prompts that validate "Coverage table has 4 rows", add a conditional:
+- If E2E configured: "Coverage table has N rows (one per framework)"
+- If no E2E: "E2E section shows N/A note"
+
+Affected:
+- `prompts/bugfix-rca/bugfix-rca-prompt.md`
+- `prompts/bug-report/bug-report-prompt.md`
+
+#### 2.5.5 Acceptance Tests Prompt
+
+In `prompts/acceptance-tests/acceptance-tests-prompt.md`, the "E2E Coverage Analyzer" sub-agent section should note: "If `context/e2e-test-coverage-map.md` indicates no E2E automation, skip the full scan and report 'N/A — No E2E automation configured' for all coverage sections."
+
 ---
 
 ## Phase 3: Verification Logic

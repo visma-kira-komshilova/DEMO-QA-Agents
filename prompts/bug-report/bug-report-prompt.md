@@ -218,7 +218,8 @@ Before submitting, verify ALL:
 - [ ] Codebase searched for similar patterns — scope reported (isolated vs cluster)
 - [ ] 3 fix options with recommended option and code snippet (3-5 lines)
 - [ ] Repro steps numbered and specific
-- [ ] E2E table has 4 rows (Selenium UI, Selenium Integration, Playwright, Mobile)
+- [ ] If E2E configured: E2E table has N rows (one per framework)
+- [ ] If no E2E: E2E section shows N/A note
 - [ ] Word count ≤ 900
 
 ---

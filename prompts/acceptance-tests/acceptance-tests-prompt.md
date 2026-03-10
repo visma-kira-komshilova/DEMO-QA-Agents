@@ -31,7 +31,9 @@ Identify: related features sharing code, downstream consumers, UI flows, integra
 
 ### E. E2E Coverage Analyzer
 
-Read `context/e2e-test-coverage-map.md` and use it as follows:
+If `context/e2e-test-coverage-map.md` indicates no E2E automation is configured, skip the full scan and report "N/A — No E2E automation configured" for all coverage sections.
+
+Otherwise, read `context/e2e-test-coverage-map.md` and use it as follows:
 1. Identify the functional area affected by the feature
 2. Look up the Quick Reference Table to determine which frameworks are in scope
 3. For each in-scope framework, use the Search Keywords from the Detailed tables to search across ALL test directories

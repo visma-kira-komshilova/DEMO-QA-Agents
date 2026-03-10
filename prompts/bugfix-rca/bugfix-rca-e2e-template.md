@@ -24,12 +24,17 @@ Output format for E2E test recommendations report (generated alongside RCA repor
 <details>
 <summary><strong>2. Existing Coverage Analysis</strong></summary>
 
+**If E2E automation is configured:**
+
 | Framework | Existing Tests | Coverage Status |
 |-----------|---------------|-----------------|
 | Selenium UI | {tests found or "None"} | Full / Partial / Gap / N/A |
 | Selenium Integration | {tests found or "None"} | Full / Partial / Gap / N/A |
 | Playwright | {tests found or "None"} | Full / Partial / Gap / N/A |
 | Mobile | {tests found or "None"} | Full / Partial / Gap / N/A |
+
+**If NO E2E automation (Q4.1 = "none"):**
+> N/A — No E2E test automation configured for this project.
 
 </details>
 
@@ -78,7 +83,8 @@ Output format for E2E test recommendations report (generated alongside RCA repor
 ## Constraints
 
 - No word limit
-- Coverage table must have 4 rows (Selenium UI, Selenium Integration, Playwright, Mobile)
+- If E2E configured: Coverage table has N rows (one per framework)
+- If no E2E: E2E section shows N/A note
 - Status uses defined thresholds: Full / Partial / Gap / N/A
 - Each scenario requires: Priority, Repository, Preconditions, Steps, Expected Result
 - Implementation code must be runnable, not pseudo-code

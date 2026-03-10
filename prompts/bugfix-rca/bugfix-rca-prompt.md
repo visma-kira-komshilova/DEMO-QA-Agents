@@ -152,7 +152,8 @@ Fetch latest from E2E repos per CLAUDE.md protocol. Use keyword-first search str
 
 ### E2E Report
 - [ ] All 5 sections completed per template
-- [ ] Coverage table has 4 rows (Selenium UI, Integration, Playwright, Mobile)
+- [ ] If E2E configured: Coverage table has N rows (one per framework)
+- [ ] If no E2E: E2E section shows N/A note
 - [ ] Status uses defined thresholds (Full/Partial/Gap/N/A)
 - [ ] Each scenario has Priority, Repository, Preconditions, Steps, Expected Result
 - [ ] Implementation code provided for Playwright + Selenium
