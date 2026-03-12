@@ -240,8 +240,9 @@ Build these replacement pairs from the collected answers:
 |------|-------------|-------|
 | `HealthBridge` | `<project-name>` | All files including agents, prompts, and templates (case-sensitive) |
 | `healthbridge` | `<project-name-lowercase>` | URLs, extension IDs |
-| `@hb-` | `@<prefix>-` | Agent definitions, package.json, extension.ts, prompts |
-| `hb-qa-agents` | `<prefix>-qa-agents` | package.json, extension.ts, commands |
+| `@hb-` | `@<prefix>-` | All files: agent definitions, package.json, extension.ts, prompts, setup scripts, bootstrap scripts |
+| `@hb ` (without dash) | `@<prefix> ` | Setup scripts, README (e.g., "type @hb in Copilot Chat") |
+| `hb-qa-agents` | `<prefix>-qa-agents` | All files: package.json, extension.ts, commands, setup scripts, bootstrap scripts |
 | `hb-qa-` | `<prefix>-` | Chat participant IDs |
 | `HM-14200` | `<first-prefix>-1001` | Example ticket IDs (all files) |
 | `HBP-5001` | `<second-prefix>-2001` (if exists) | Example ticket IDs (all files) |
