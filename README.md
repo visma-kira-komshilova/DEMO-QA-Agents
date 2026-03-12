@@ -853,16 +853,10 @@ The **Setup Agent** walks you through customization interactively:
 
 It asks questions about your project, then updates all configuration files automatically:
 
-1. **Collect** — Project name, GitHub org, JIRA prefixes, repositories, tech stack, business domains
-2. **Generate** — Updates IDE configs, extension, setup scripts, agent definitions, creates skeleton context files
+1. **Collect** — Project name, agent prefix, JIRA prefixes, repository clone URLs, tech stack, business domains
+2. **Generate** — Updates IDE configs, extension, setup scripts, agent definitions, prompts, and templates
 3. **Verify** — Scans for leftover demo references, validates consistency across all files
-
-After setup completes, run the environment setup script to clone your repositories and set up the multi-repo workspace:
-
-```bash
-./setup/setup.sh          # macOS/Linux
-.\setup\setup.ps1         # Windows
-```
+4. **Context Customization** — Auto-generates repository dependencies, E2E coverage map, JIRA mappings, and guides you through domain knowledge and bugfix patterns
 
 ### What Gets Customized
 
@@ -872,7 +866,8 @@ After setup completes, run the environment setup script to clone your repositori
 | **VS Code Extension** | `.vscode-extension/package.json`, `extension.ts` | Automated by setup agent |
 | **Setup Scripts** | `setup/setup.sh`, `setup.ps1`, `.code-workspace` | Automated by setup agent |
 | **Agent Definitions** | `agents/vscode-chat-participants/*.md` (8 files) | Automated by setup agent |
-| **Context Files** | `context/*.md` (domain knowledge, dependencies, patterns) | Skeleton created; **you fill in content** |
+| **Prompts & Templates** | `prompts/**/*.md` | Automated by setup agent |
+| **Context Files** | `context/*.md` (domain knowledge, dependencies, patterns) | Auto-generated + interactive guided setup |
 
 ### What Stays Generic (Do NOT Change)
 
