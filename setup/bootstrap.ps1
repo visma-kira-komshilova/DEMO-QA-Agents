@@ -181,10 +181,8 @@ Write-Host "  3. Open in your IDE and run the Setup Agent:"
 Write-Host "     @hb-setup" -ForegroundColor Blue
 Write-Host ""
 Write-Host "  The Setup Agent will ask about your project (name, repos, ticket"
-Write-Host "  prefixes, domains) and update all files automatically."
-Write-Host ""
-Write-Host "  4. After setup, run the environment setup script to clone your repos:"
-Write-Host "     .\setup\setup.ps1" -ForegroundColor Blue
+Write-Host "  prefixes, domains), update all files, clone your repos, and"
+Write-Host "  generate context files automatically."
 Write-Host ""
 Write-Host "Note: " -ForegroundColor Yellow -NoNewline
 Write-Host "The DEMO template is unchanged - you can bootstrap again for another project."
