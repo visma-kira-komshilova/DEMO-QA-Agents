@@ -567,7 +567,7 @@ Scanning your test repositories for E2E coverage by functional area...
 ```
 Do your repositories have hotfix history I can analyze?
 This helps agents predict which code patterns are most likely to cause bugs.
-I need roughly 10+ hotfixes for meaningful patterns.
+I'll analyze up to 100 recent hotfixes for reliable category percentages.
 
   1. Yes, scan my repos now
   2. Skip — I'll run this later when we have more history
