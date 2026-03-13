@@ -127,7 +127,7 @@ Follow the question flow defined in `prompts/setup/setup-prompt.md`. Store all a
 
 | File | Changes |
 |------|---------|
-| `.claude/CLAUDE.md` | Project name, ticket prefixes, repo table, agent prefix, context file refs, example tickets |
+| `.claude/CLAUDE.md` | Project name, ticket prefixes, repo table, agent prefix, context file refs, example tickets. **Development Context section**: if Q6.1 = "none" remove entirely; if path provided, rebuild with actual doc paths, scan AGENTS-*.md files to populate Key Knowledge table with real class names and patterns (replaces healthcare-specific HBException, HBForm, TenantID, etc.) |
 | `.cursorrules` | Same as CLAUDE.md (mirrors instructions) |
 | `.github/copilot-instructions.md` | Same as CLAUDE.md (mirrors instructions) |
 | `HealthBridge.code-workspace` | Rename file, update folder list |

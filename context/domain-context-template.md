@@ -10,7 +10,7 @@
 
 ## How Agents Use This File
 
-1. **Identify functional area** from the ticket (e.g., Prescriptions, Patient Records, Staff Scheduling)
+1. **Identify functional area** from the ticket (e.g., Invoicing, Payroll, User Management)
 2. **Load matching domain file:** `context/domain-<area>.md`
 3. **Cross-reference requirements** against regulatory rules and business rules below
 4. **Flag gaps** where requirements don't address mandatory domain constraints
@@ -30,8 +30,8 @@
 
 | Rule ID | Requirement | Regulation/Source | Compliance Level | Impact if Missed |
 |---------|-------------|-------------------|------------------|------------------|
-| REG-001 | [What must the system do?] | [Law/regulation name, e.g., HIPAA, FDA 21 CFR Part 11, CMS CoP] | Mandatory / Recommended | [Regulatory citation / Patient safety risk / Financial penalty] |
-| REG-002 | [What must the system do?] | [Law/regulation name] | Mandatory / Recommended | [Regulatory citation / Patient safety risk / Financial penalty] |
+| REG-001 | [What must the system do?] | [Law/regulation name, e.g., GDPR, SOX, PCI-DSS, industry-specific] | Mandatory / Recommended | [Fine / Data breach risk / Audit failure] |
+| REG-002 | [What must the system do?] | [Law/regulation name] | Mandatory / Recommended | [Impact description] |
 
 ---
 
@@ -52,7 +52,7 @@
 
 | Scenario | Required Behavior | Regulatory Basis | Severity if Missed |
 |----------|-------------------|------------------|--------------------|
-| [Domain-specific scenario, e.g., "Prescription for controlled substance with no DEA number on file"] | [What should happen, e.g., "Block e-prescribing; require manual verification"] | [Regulation or N/A, e.g., "DEA Schedule II-V rules"] | Critical / High / Medium |
+| [Domain-specific scenario, e.g., "Invoice with zero amount and multiple tax rates"] | [What should happen, e.g., "Reject with validation error; log attempt"] | [Regulation or N/A, e.g., "Tax authority reporting rules"] | Critical / High / Medium |
 | [Domain-specific scenario] | [What should happen] | [Regulation or N/A] | Critical / High / Medium |
 
 ---
@@ -63,7 +63,7 @@
 
 | External System | Data Exchange | Direction | Format | Deadlines | Error Handling |
 |-----------------|---------------|-----------|--------|-----------|----------------|
-| [System name, e.g., "State Prescription Drug Monitoring Program (PDMP)"] | [What data?, e.g., "Controlled substance dispensing records"] | Send / Receive / Both | [HL7/FHIR/X12/JSON/CSV] | [When?, e.g., "Within 24 hours of dispensing"] | [Retry / Queue / Fail] |
+| [System name, e.g., "Tax authority reporting API"] | [What data?, e.g., "VAT return submissions"] | Send / Receive / Both | [REST/SOAP/JSON/XML/CSV] | [When?, e.g., "Monthly by 12th"] | [Retry / Queue / Fail] |
 
 ---
 
@@ -73,7 +73,7 @@
 
 | Field / Calculation | Rule | Error Handling | Regulatory Basis |
 |---------------------|------|----------------|------------------|
-| [Field or calculation name, e.g., "Medication dosage"] | [Specific validation rule, e.g., "Must be within therapeutic range for patient weight/age"] | [What to show user, e.g., "Warning: dosage exceeds recommended range"] | [Regulation or business rule, e.g., "Clinical safety protocol"] |
+| [Field or calculation name, e.g., "Invoice total"] | [Specific validation rule, e.g., "Line totals must sum to invoice total within rounding tolerance"] | [What to show user, e.g., "Error: rounding discrepancy detected"] | [Regulation or business rule, e.g., "Accounting standards"] |
 
 ---
 
@@ -83,17 +83,17 @@
 
 | What | When | Who Reports | Penalty for Late | System Impact |
 |------|------|-------------|------------------|---------------|
-| [Reporting obligation, e.g., "PDMP reporting"] | [Deadline, e.g., "24 hours after dispensing"] | [Pharmacist / Clinician / System auto] | [Consequence, e.g., "State regulatory fine"] | [What system must do, e.g., "Auto-submit after dispensing event"] |
+| [Reporting obligation, e.g., "VAT return filing"] | [Deadline, e.g., "Monthly by 12th"] | [Accountant / System auto] | [Consequence, e.g., "Late filing penalty"] | [What system must do, e.g., "Generate report, notify responsible user"] |
 
 ---
 
 ## Terminology
 
-> Domain-specific terms with abbreviations and definitions for the health management domain.
+> Domain-specific terms with abbreviations and definitions.
 
 | English Term | Abbreviation | Definition |
 |-------------|-------------|------------|
-| [Term, e.g., "Drug Enforcement Administration"] | [DEA] | [Brief definition, e.g., "Federal agency regulating controlled substances"] |
+| [Term, e.g., "Value Added Tax"] | [VAT] | [Brief definition, e.g., "Consumption tax on goods and services"] |
 
 ---
 
@@ -103,7 +103,7 @@ Domain context files follow the pattern: `domain-<area>.md`
 
 | Functional Area | File Name | Keywords (trigger loading) |
 |-----------------|-----------|---------------------------|
-| [Area, e.g., "Prescriptions"] | `domain-prescriptions.md` | [keyword1, keyword2, keyword3, e.g., "prescription, medication, dosage, refill, e-prescribing"] |
+| [Area, e.g., "Invoicing"] | `domain-invoicing.md` | [keyword1, keyword2, keyword3, e.g., "invoice, billing, credit note, payment term"] |
 
 ---
 
@@ -121,5 +121,5 @@ Domain context files follow the pattern: `domain-<area>.md`
 
 ---
 
-**Template Version:** 1.0
+**Template Version:** 1.1
 **Created:** 2026-02-27

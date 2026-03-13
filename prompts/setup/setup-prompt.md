@@ -294,20 +294,74 @@ Rebuild with new prefix and correct agent IDs.
 - Update `findRepoRoot()` to check for one of the new core repo names
 - Update activation message
 
+**`.claude/CLAUDE.md`, `.github/copilot-instructions.md`, `.cursorrules` — Development Context Section:**
+
+These three instruction files share an identical "Development Context for QA Agents" section that contains healthcare-specific architecture patterns. This section requires **conditional structured updates** based on Q6.1:
+
+**If Q6.1 = "none" (no dev context docs):**
+Remove these sections entirely from all three files:
+- "HealthBridge-Web Development Context for QA Agents" header and intro paragraph
+- "Agent-to-Document Mapping" table
+- "How to Read" code block
+- "When to read" paragraph
+- "Key Knowledge per Document" table
+
+**If Q6.1 = path provided (e.g., "Severa-BackEnd/docs/AGENTS-*.md"):**
+
+1. **Section header** — Replace `HealthBridge-Web` with the repo name from Q6.1 path:
+   ```
+   ## <repo-name> Development Context for QA Agents
+   ```
+
+2. **Intro paragraph** — Replace `HM-*` with appropriate prefix, `HealthBridge-Web` with repo name, and `HealthBridge-Web/docs/` with actual path from Q6.1.
+
+3. **Agent-to-Document Mapping table** — Scan the actual doc path for existing `AGENTS-*.md` files. Rebuild the table with only files that exist. Remove rows for non-existent docs.
+
+4. **"How to Read" path** — Replace with actual path from Q6.1:
+   ```
+   Read: <repo-name>/docs/AGENTS-<name>.md
+   ```
+
+5. **"When to read" paragraph** — Replace prefix references with collected prefixes.
+
+6. **"Key Knowledge per Document" table** — This is the most critical update. The DEMO table contains healthcare-specific class names and patterns:
+
+   | DEMO Pattern | What to Do |
+   |-------------|------------|
+   | `HBException hierarchy` | Read the actual `AGENTS-errorhandling.md` and extract the real exception class names |
+   | `HBForm/HBModal` | Read the actual `AGENTS-frontend.md` and extract real UI component names |
+   | `HealthBridge JS library` | Replace with actual frontend library/framework name |
+   | `TenantID filtering` | Read `AGENTS-development-guidelines.md` and extract the real multi-tenancy term |
+   | `Accessor (CRUD) vs Report (read-only)` | Read `AGENTS-datalayer.md` and extract the real data access pattern names |
+   | `Validator class, ValidatorField types` | Read `AGENTS-validation.md` and extract real validation class names |
+   | `API integration patterns, data node interfaces` | Read `AGENTS-api.md` and extract real API pattern names |
+   | `BackgroundServiceInitializer` | Read `AGENTS-backgroundservices.md` and extract real background service class |
+
+   **Strategy:** For each existing `AGENTS-*.md` file found in Q6.1 path:
+   1. Read the file (first 100 lines or summary section)
+   2. Extract key class names, patterns, and concepts
+   3. Write a one-line summary for the "Key Knowledge" column
+   4. If a file doesn't exist, remove its row from the table
+
 **`prompts/` — All prompt and template files:**
 
 The global find-and-replace (Section 2.1) handles most references automatically. Additionally, these files need structured updates:
 
 | File | Structured Changes |
 |------|-------------------|
-| `prompts/bug-report/bug-report-prompt.md` | Rebuild repo detection table with repos from Phase 1 |
+| `prompts/bug-report/bug-report-prompt.md` | Rebuild repo detection table with repos from Phase 1. Replace healthcare severity examples (patient safety, clinical workflow, prescription dosage) with project-relevant examples. Replace healthcare JIRA component paths (`*/prescriptions/*`, `*/patients/*`) with project paths. Replace healthcare area labels with project domains |
 | `prompts/bug-report/bug-report-template.md` | Rebuild E2E coverage table with frameworks and repos from Phase 1 |
-| `prompts/code-review-qa/code-review-template.md` | Update E2E repo paths to match Phase 1 test repos |
-| `prompts/code-review-qa/code-review-qa.md` | Update project description and technology stack |
+| `prompts/bug-report/severity-criteria.md` | **Heavy healthcare content.** Replace all healthcare-specific examples throughout: "patient safety" → project-relevant safety concern, "prescription processing" → core business process, "clinical workflow" → domain workflow, "HIPAA" → applicable regulations. Replace user personas (physicians, nurses, patients) with project personas. Replace example scenarios (prescription dosage, lab results, patient records) with project scenarios |
+| `prompts/code-review-qa/code-review-template.md` | Update E2E repo paths to match Phase 1 test repos. Replace "Patient Safety Impact" row with project-relevant impact category. Replace "clinical logic" references with project domain terms |
+| `prompts/code-review-qa/code-review-qa.md` | Update project description and technology stack. Replace "patient safety" and "clinical" references with project-relevant terms |
+| `prompts/code-review-qa/findings-detailed-template.md` | Replace healthcare example scenarios ("Patient with no allergy records", "self-pay patients", "prescription") with project-relevant examples |
 | `prompts/dev-estimation/dev-estimation-template.md` | Rebuild per-repo sections (2.1, 2.2, etc.) using repos from Phase 1 with their technologies |
 | `prompts/release-assessment/release-assessment-template.md` | Rebuild E2E test sections with framework names and repos from Phase 1 |
-| `prompts/release-assessment/release-assessment-prompt.md` | Update project description |
-| `prompts/requirements-analysis/requirements-analysis-template.md` | Rebuild cross-repo impact table with repos from Phase 1 |
+| `prompts/release-assessment/release-assessment-prompt.md` | Replace project description ("health management platform", "patient data accuracy", "clinical safety"). Replace healthcare risk categories ("patient-facing features", "patient safety"). Replace priority definitions ("clinical calculations", "core clinical logic") with project-relevant terms |
+| `prompts/release-assessment/release-notes-prompt.md` | Replace healthcare category mapping table (Prescription/Patient/Chart keywords) with project domain categories. Replace "patient-safety items" with project-relevant priority term |
+| `prompts/requirements-analysis/requirements-analysis-template.md` | Rebuild cross-repo impact table with repos from Phase 1. Replace "healthcare regulations" in Domain Compliance criteria with project-relevant compliance. Replace "National e-Prescription Registry" integration example |
+| `prompts/requirements-analysis/requirements-analysis.md` | Replace healthcare user personas (physicians, nurses, patients) with project personas. Replace "clinical limits/thresholds", "prescription validity", "patient data" examples with project-relevant examples. Replace healthcare edge case table (patient records, prescription expiry) and integration references (HL7/FHIR, EHR) |
+| `prompts/setup/generate-bugfix-patterns.md` | Replace "patient query" example with project-relevant code pattern example |
 
 **`agents/vscode-chat-participants/` — All agent definition files:**
 
@@ -402,6 +456,10 @@ After all file updates are complete, delete leftover files from the DEMO templat
 | `.vscode-extension/dist/` | Will be regenerated by `npm run compile` during extension rebuild |
 | `.vscode-extension/package-lock.json` | Will be regenerated by `npm install` |
 | `HealthBridge.code-workspace` | Old workspace file — already renamed to `<project>.code-workspace` |
+| `context/domain-prescriptions.md` | DEMO healthcare domain file — replaced by project domains from Q5.1 |
+| `context/domain-patient-records.md` | DEMO healthcare domain file — replaced by project domains from Q5.1 |
+| `context/domain-staff-scheduling.md` | DEMO healthcare domain file — replaced by project domains from Q5.1 |
+| `context/healthbridge-repository-dependencies.md` | DEMO dependencies file — replaced by `context/<project>-repository-dependencies.md` |
 
 ```bash
 # Remove old VSIX files (any that don't match new prefix)
